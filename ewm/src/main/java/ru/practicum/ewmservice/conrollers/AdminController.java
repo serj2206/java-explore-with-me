@@ -26,9 +26,7 @@ import java.util.List;
 @Slf4j
 @Validated
 public class AdminController {
-
     private final AdminService adminService;
-
 
     //Admin: События
 
