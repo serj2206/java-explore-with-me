@@ -65,31 +65,24 @@ public class AdminService {
 
     //Изменение категории
     public CategoryDto updateCategory(CategoryDto categoryDto) {
-
-
-        //Обратите внимание: имя категории должно быть уникальным
-        return null;
-    }
-
-    //Добавление новой категории
-    public CategoryDto addCategory(NewCategoryDto newCategoryDto) {
-        Category validCategory = categoryRepository.findByName(newCategoryDto.getName());
-        System.out.println("addCategory");
-        if(validCategory != null)
-            throw new BadRequestException(String.format("Имя категории \"%S\" в БД уже есть.", newCategoryDto.getName()));
-
-        Category category = CategoryMapper.toCategory(newCategoryDto);
-
+        Category category = CategoryMapper.toCategory(categoryDto);
 
         //Обратите внимание: имя категории должно быть уникальным
         return CategoryMapper.toCategoryDto(categoryRepository.save(category));
     }
 
+    //Добавление новой категории
+    public CategoryDto addCategory(NewCategoryDto newCategoryDto) {
+        Category category = CategoryMapper.toCategory(newCategoryDto);
+        return CategoryMapper.toCategoryDto(categoryRepository.save(category));
+    }
+
     //Удаление категории
-    public CategoryDto deleteCategory(int catId) {
+    public void deleteCategory(int catId) {
+        categoryRepository.deleteById(catId);
 
         //Обратите внимание: с категорией не должно быть связано ни одного события.
-        return null;
+        return;
     }
 
     //Admin: Пользователи

@@ -68,20 +68,23 @@ public class AdminController {
     //Изменение категории
     @PatchMapping("/categories")
     public CategoryDto updateCategory(@Validated({Update.class}) @RequestBody CategoryDto categoryDto) {
+        log.info("AdminController: PATH /admin/categories: updateCategory() categoryDto = {}", categoryDto);
         return adminService.updateCategory(categoryDto);
     }
 
     //Добавление новой категории
     @PostMapping("/categories")
     public CategoryDto addCategory(@Validated({Create.class}) @RequestBody NewCategoryDto newСategoryDto) {
-        log.info("AdminController: POST/admin/categories addCategory() newСategoryDto = {}", newСategoryDto);
+        log.info("AdminController: POST/admin/categories: addCategory() newСategoryDto = {}", newСategoryDto);
         return adminService.addCategory(newСategoryDto);
     }
 
     //Удаление категории
     @DeleteMapping("/categories/{catId}")
-    public CategoryDto deleteCategory(@Positive @PathVariable Integer catId) {
-        return adminService.deleteCategory(catId);
+    public void deleteCategory(@Positive @PathVariable Integer catId) {
+        log.info("AdminController: DELETE /admin/categories: deleteCategory() catId = {}", catId);
+        adminService.deleteCategory(catId);
+        return;
     }
 
 
