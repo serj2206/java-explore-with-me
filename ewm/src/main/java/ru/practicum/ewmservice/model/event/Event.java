@@ -2,7 +2,7 @@ package ru.practicum.ewmservice.model.event;
 
 
 import lombok.*;
-import ru.practicum.ewmservice.model.categorie.Category;
+import ru.practicum.ewmservice.model.category.Category;
 import ru.practicum.ewmservice.model.compilation.Compilation;
 import ru.practicum.ewmservice.model.user.User;
 

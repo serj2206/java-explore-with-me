@@ -2,8 +2,8 @@ package ru.practicum.statsserver.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.practicum.statsserver.model.ViewStats;
-import ru.practicum.statsserver.model.dto.EndpointHitDto;
+import ru.practicum.statsserver.model.statsinfo.ViewStats;
+import ru.practicum.statsserver.model.statsinfo.dto.EndpointHitDto;
 import ru.practicum.statsserver.repository.StatisticsRepository;
 
 import java.util.List;

@@ -1,8 +1,7 @@
 package ru.practicum.ewmservice.model.event.dto;
 
 import lombok.*;
-import ru.practicum.ewmservice.model.categorie.Category;
-import ru.practicum.ewmservice.model.categorie.dto.CategoryDto;
+import ru.practicum.ewmservice.model.category.dto.CategoryDto;
 import ru.practicum.ewmservice.model.event.Event;
 import ru.practicum.ewmservice.model.user.dto.UserShortDto;
 

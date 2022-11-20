@@ -1,8 +1,7 @@
 package ru.practicum.ewmservice.model.event.dto;
 
 import lombok.*;
-import ru.practicum.ewmservice.model.categorie.Category;
-import ru.practicum.ewmservice.model.categorie.dto.CategoryDto;
+import ru.practicum.ewmservice.model.category.dto.CategoryDto;
 import ru.practicum.ewmservice.model.event.Event;
 import ru.practicum.ewmservice.model.event.State;
 import ru.practicum.ewmservice.model.location.Location;
@@ -34,25 +33,25 @@ public class EventFullDto {
 
     private State state;
 
-    private boolean paid;
+    private Boolean paid;
 
-    private int participantLimit;
+    private Integer participantLimit;
 
     private LocalDateTime publishedOn;
 
     private LocalDateTime createdOn;
 
     //Количество просмотров
-    private int views;
+    private Integer views;
 
     //Количество оформленных заявок
-    private int confirmedRequests;
+    private Integer confirmedRequests;
 
-    private boolean requestModeration;
+    private Boolean requestModeration;
 
     private LocalDateTime eventDate;
 
-    public EventFullDto(Event event, int views, int confirmedRequests) {
+    public EventFullDto(Event event, Integer views, Integer confirmedRequests) {
         this.id = event.getId();
         this.title = event.getTitle();
         this.annotation = event.getAnnotation();

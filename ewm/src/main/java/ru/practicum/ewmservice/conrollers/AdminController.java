@@ -5,8 +5,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewmservice.common.marker.Create;
 import ru.practicum.ewmservice.common.marker.Update;
-import ru.practicum.ewmservice.model.categorie.dto.CategoryDto;
-import ru.practicum.ewmservice.model.categorie.dto.NewCategoryDto;
+import ru.practicum.ewmservice.model.category.dto.CategoryDto;
+import ru.practicum.ewmservice.model.category.dto.NewCategoryDto;
 import ru.practicum.ewmservice.model.compilation.dto.CompilationDto;
 import ru.practicum.ewmservice.model.compilation.dto.NewCompilationDto;
 import ru.practicum.ewmservice.model.event.dto.AdminUpdateEventRequest;
@@ -20,7 +20,8 @@ import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @RequiredArgsConstructor
-@RestController("/admin")
+@RestController
+@RequestMapping(path = "/admin")
 public class AdminController {
 
     private final AdminService adminService;

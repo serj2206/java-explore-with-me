@@ -1,11 +1,10 @@
-package ru.practicum.ewmservice.model.categorie.dto;
+package ru.practicum.ewmservice.model.category.dto;
 
 import lombok.*;
 import ru.practicum.ewmservice.common.marker.Create;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 
 @EqualsAndHashCode
 @ToString

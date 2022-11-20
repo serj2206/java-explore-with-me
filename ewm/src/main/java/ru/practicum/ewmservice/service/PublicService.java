@@ -2,12 +2,14 @@ package ru.practicum.ewmservice.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.practicum.ewmservice.model.categorie.dto.CategoryDto;
+import ru.practicum.ewmservice.model.category.dto.CategoryDto;
+import ru.practicum.ewmservice.model.category.mapper.CategoryMapper;
 import ru.practicum.ewmservice.model.compilation.dto.CompilationDto;
 import ru.practicum.ewmservice.model.event.Event;
 import ru.practicum.ewmservice.model.event.dto.EventFullDto;
 import ru.practicum.ewmservice.model.event.dto.EventShortDto;
 import ru.practicum.ewmservice.model.event.mapper.EventMapper;
+import ru.practicum.ewmservice.repository.CategoryRepository;
 import ru.practicum.ewmservice.repository.EventRepository;
 
 import java.util.List;
@@ -17,11 +19,12 @@ import java.util.List;
 public class PublicService {
 
     private final EventRepository eventRepository;
+    private final CategoryRepository categoryRepository;
 
     public EventFullDto findEventById(Long id) {
         int views = 0; //Получить количество просмотров из сервера статистики
         int confirmedRequests = 0; //Узнать количество оформленны заявок
-        Event event = eventRepository.findEventById(id);
+        Event event = eventRepository.findById(id).orElseThrow();
         EventFullDto eventFullDto = EventMapper.toEventFullDto(event, views, confirmedRequests);
         //Отправить статистику в сервер статистики
         return eventFullDto;
@@ -52,7 +55,7 @@ public class PublicService {
         return null;
     }
 
-    public CategoryDto findCategoryById(long catId) {
-        return null;
+    public CategoryDto findCategoryById(Integer catId) {
+        return CategoryMapper.toCategoryDto(categoryRepository.findById(catId).orElseThrow());
     }
 }

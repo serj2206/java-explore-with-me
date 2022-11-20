@@ -5,8 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.statsserver.common.marker.Create;
-import ru.practicum.statsserver.model.ViewStats;
-import ru.practicum.statsserver.model.dto.EndpointHitDto;
+import ru.practicum.statsserver.model.statsinfo.ViewStats;
+import ru.practicum.statsserver.model.statsinfo.dto.EndpointHitDto;
 import ru.practicum.statsserver.service.StatsService;
 
 import java.util.List;

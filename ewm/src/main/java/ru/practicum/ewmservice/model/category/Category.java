@@ -1,4 +1,4 @@
-package ru.practicum.ewmservice.model.categorie;
+package ru.practicum.ewmservice.model.category;
 
 import lombok.*;
 

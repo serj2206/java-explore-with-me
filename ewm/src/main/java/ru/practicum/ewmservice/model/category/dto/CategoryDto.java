@@ -1,10 +1,9 @@
-package ru.practicum.ewmservice.model.categorie.dto;
+package ru.practicum.ewmservice.model.category.dto;
 
 import lombok.*;
 import ru.practicum.ewmservice.common.marker.Update;
-import ru.practicum.ewmservice.model.categorie.Category;
+import ru.practicum.ewmservice.model.category.Category;
 
-import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Positive;
 
 @EqualsAndHashCode

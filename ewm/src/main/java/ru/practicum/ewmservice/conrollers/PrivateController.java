@@ -15,7 +15,8 @@ import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @RequiredArgsConstructor
-@RestController("/users")
+@RestController
+@RequestMapping(path = "/users")
 @Validated
 public class PrivateController {
     private final PrivateService privateService;

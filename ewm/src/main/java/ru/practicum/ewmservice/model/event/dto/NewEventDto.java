@@ -33,7 +33,7 @@ public class NewEventDto {
     @Positive(groups = {Create.class})
     private int category;
 
-    private boolean paid;
+    private Boolean paid;
 
     @NotNull(groups = {Create.class})
     private Location location;
@@ -41,7 +41,7 @@ public class NewEventDto {
     @NotNull(groups = {Create.class})
     private LocalDateTime eventDate;
 
-    private boolean requestModeration;
+    private Boolean requestModeration;
 
-    private int participantLimit;
+    private Integer participantLimit;
 }

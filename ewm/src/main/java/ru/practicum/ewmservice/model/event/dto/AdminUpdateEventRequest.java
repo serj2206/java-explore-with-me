@@ -1,7 +1,6 @@
 package ru.practicum.ewmservice.model.event.dto;
 
 import lombok.*;
-import ru.practicum.ewmservice.model.categorie.Category;
 import ru.practicum.ewmservice.model.location.Location;
 
 import java.time.LocalDateTime;

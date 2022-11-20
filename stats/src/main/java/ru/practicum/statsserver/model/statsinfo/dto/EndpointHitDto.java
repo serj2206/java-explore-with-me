@@ -1,4 +1,4 @@
-package ru.practicum.statsserver.model.dto;
+package ru.practicum.statsserver.model.statsinfo.dto;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;

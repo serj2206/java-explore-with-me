@@ -2,16 +2,27 @@ package ru.practicum.ewmservice.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.practicum.ewmservice.client.PublicClient;
+import ru.practicum.ewmservice.exceptions.ValidationException;
+import ru.practicum.ewmservice.model.category.Category;
 import ru.practicum.ewmservice.model.event.Event;
 import ru.practicum.ewmservice.model.event.dto.EventFullDto;
 import ru.practicum.ewmservice.model.event.dto.EventShortDto;
 import ru.practicum.ewmservice.model.event.dto.NewEventDto;
 import ru.practicum.ewmservice.model.event.dto.UpdateEventRequest;
+import ru.practicum.ewmservice.model.event.mapper.EventMapper;
 import ru.practicum.ewmservice.model.request.Request;
 import ru.practicum.ewmservice.model.request.dto.ParticipationRequestDto;
+import ru.practicum.ewmservice.model.statistic.ViewStats;
+import ru.practicum.ewmservice.model.user.User;
+import ru.practicum.ewmservice.repository.CategoryRepository;
 import ru.practicum.ewmservice.repository.EventRepository;
 import ru.practicum.ewmservice.repository.RequestRepository;
+import ru.practicum.ewmservice.repository.UserRepository;
+import ru.practicum.ewmservice.validation.Validation;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -20,6 +31,9 @@ public class PrivateService {
 
     private final EventRepository eventRepository;
     private final RequestRepository requestRepository;
+    private final UserRepository userRepository;
+    private final CategoryRepository categoryRepository;
+    private final PublicClient publicClient;
 
 
     //Public: События
@@ -38,15 +52,35 @@ public class PrivateService {
 
     //Добавление нового события
     public EventFullDto addEvent(long userId, NewEventDto newEventDto) {
+
+        User user = userRepository.findById(userId).orElseThrow();
+        Category category = categoryRepository.findById(newEventDto.getCategory()).orElseThrow();
+        LocalDateTime createdOn = LocalDateTime.now();
         //дата и время на которые намечено событие не может быть раньше, чем через два часа от текущего момента
-        return null;
+        Validation.eventDateValidation(newEventDto.getEventDate());
+        Event event = EventMapper.toEvent(newEventDto, category, createdOn, user);
+
+
+        return EventMapper.toEventFullDto(eventRepository.save(event), null, null);
     }
 
     //Получение полной информации о событии, добавленном текущим пользователем
     public EventFullDto findEventById(long userId, long eventId) {
 
-        Event event = eventRepository.findEventById(eventId);
-        return null;
+        userRepository.findById(userId);
+
+        Event event = eventRepository.findById(eventId).orElseThrow();
+
+        if (userId != event.getInitiator().getId()) throw new ValidationException("");
+
+        ViewStats viewStats = (ViewStats) publicClient.findStats(
+                        event.getPublishedOn().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+                        event.getEventDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), 0, 1)
+                .getBody();
+
+        Integer confirmedRequests = (int) requestRepository.count(); //Дописать запрос
+
+        return EventMapper.toEventFullDto(event, viewStats.getHits(), confirmedRequests);
     }
 
     //Отмена события, добавленного текущим пользователем
@@ -72,7 +106,7 @@ public class PrivateService {
         return null;
     }
 
-    //Отклонение чужой заявки на участие в событии текщего пользователя
+    //Отклонение чужой заявки на участие в событии текущего пользователя
     public ParticipationRequestDto rejectParticipationRequest(long userId, long eventId, long reqId) {
 
         return null;
@@ -87,7 +121,7 @@ public class PrivateService {
         return null;
     }
 
-    //Добавление запроса от текущего пользователя на участие в событи
+    //Добавление запроса от текущего пользователя на участие в событии
     public ParticipationRequestDto addRequest(long userId, long reqId) {
         /*
         Нельзя добавить повторный запрос
