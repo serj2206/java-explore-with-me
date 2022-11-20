@@ -11,4 +11,6 @@ public class Validation {
                     throw new ValidationException("Дата и время на которые намечено событие не может быть раньше, чем через два часа от текущего момента");
         return true;
     }
+
+
 }

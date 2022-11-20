@@ -74,7 +74,10 @@ public class AdminService {
     public CategoryDto addCategory(NewCategoryDto newCategoryDto) {
         Category validCategory = categoryRepository.findByName(newCategoryDto.getName());
 
+        if(validCategory != null) throw new RuntimeException();
+
         Category category = CategoryMapper.toCategory(newCategoryDto);
+
 
         //Обратите внимание: имя категории должно быть уникальным
         return CategoryMapper.toCategoryDto(categoryRepository.save(category));

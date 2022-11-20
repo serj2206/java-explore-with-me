@@ -1,7 +1,12 @@
 package ru.practicum.ewmservice.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import ru.practicum.ewmservice.common.FromSizeRequest;
+import ru.practicum.ewmservice.model.category.Category;
 import ru.practicum.ewmservice.model.category.dto.CategoryDto;
 import ru.practicum.ewmservice.model.category.mapper.CategoryMapper;
 import ru.practicum.ewmservice.model.compilation.dto.CompilationDto;
@@ -13,6 +18,7 @@ import ru.practicum.ewmservice.repository.CategoryRepository;
 import ru.practicum.ewmservice.repository.EventRepository;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -52,7 +58,18 @@ public class PublicService {
     }
 
     public List<CategoryDto> getCategories(int from, int size) {
-        return null;
+
+        List<CategoryDto> categoryDtoList;
+        Sort sortById = Sort.by(Sort.Direction.ASC, "id");
+        Pageable pageable = FromSizeRequest.of(from, size, sortById);
+
+        Page<Category> categoryPage = categoryRepository.findCategoriesByIdIsNotNull(pageable);
+
+        categoryDtoList = categoryPage.stream()
+                .map(CategoryMapper :: toCategoryDto)
+                .collect(Collectors.toList());
+
+        return categoryDtoList;
     }
 
     public CategoryDto findCategoryById(Integer catId) {
