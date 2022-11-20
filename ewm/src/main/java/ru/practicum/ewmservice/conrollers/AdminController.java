@@ -1,6 +1,7 @@
 package ru.practicum.ewmservice.conrollers;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewmservice.common.marker.Create;
@@ -22,6 +23,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping(path = "/admin")
+@Slf4j
 public class AdminController {
 
     private final AdminService adminService;
@@ -72,6 +74,7 @@ public class AdminController {
     //Добавление новой категории
     @PostMapping("/categories")
     public CategoryDto addCategory(@Validated({Create.class}) @RequestBody NewCategoryDto newСategoryDto) {
+        log.info("AdminController: POST/admin/categories addCategory() newСategoryDto = {}", newСategoryDto);
         return adminService.addCategory(newСategoryDto);
     }
 
@@ -149,13 +152,3 @@ public class AdminController {
     }
 }
 
-/*
-План
-1. AdminController - V
-2. Client - не понятно
-3. StatController
-4. StatServer
-5. StatRepository
-6. Исключения
-7.
- */

@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -13,6 +14,6 @@ public class ErrorResponse {
     private String message;
     private String reason;
     private String status;
-    private LocalDateTime timestamp;
+    private String timestamp;
 
 }

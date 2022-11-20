@@ -2,6 +2,7 @@ package ru.practicum.ewmservice.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.practicum.ewmservice.exceptions.BadRequestException;
 import ru.practicum.ewmservice.model.category.Category;
 import ru.practicum.ewmservice.model.category.dto.CategoryDto;
 import ru.practicum.ewmservice.model.category.dto.NewCategoryDto;
@@ -73,8 +74,9 @@ public class AdminService {
     //Добавление новой категории
     public CategoryDto addCategory(NewCategoryDto newCategoryDto) {
         Category validCategory = categoryRepository.findByName(newCategoryDto.getName());
-
-        if(validCategory != null) throw new RuntimeException();
+        System.out.println("addCategory");
+        if(validCategory != null)
+            throw new BadRequestException(String.format("Имя категории \"%S\" в БД уже есть.", newCategoryDto.getName()));
 
         Category category = CategoryMapper.toCategory(newCategoryDto);
 
