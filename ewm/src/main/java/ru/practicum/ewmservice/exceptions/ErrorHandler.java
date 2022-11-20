@@ -45,15 +45,15 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleBadRequestException(final ConstraintViolationException e) {
-        log.warn("400 {}", e.getSQLException().getMessage());
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handleConflictException(final ConstraintViolationException e) {
+        log.warn("409 {}", e.getSQLException().getMessage());
         List<String> errors = null;
         return new ErrorResponse(
                 errors,
                 e.getSQLException().getMessage(),
-                "Неверный запрос",
-                HttpStatus.BAD_REQUEST.toString(),
+                "Запрос приводит к нарушению целостности данных",
+                HttpStatus.CONFLICT.toString(),
                 LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
     }
 

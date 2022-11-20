@@ -92,22 +92,27 @@ public class AdminController {
 
     //Получении информации о пользователе
     @GetMapping("/users")
-    public List<UserDto> getUser(@RequestParam(required = false) List<Integer> ids,
+    public List<UserDto> getUser(@RequestParam(required = false) List<Long> ids,
                                  @PositiveOrZero @RequestParam(defaultValue = "0") int from,
                                  @Positive @RequestParam(defaultValue = "10") int size) {
+        log.info("AdminController: GET /admin/users: getUser() ids = {}, from = {}, size = {}", ids, from, size);
         return adminService.getUser(ids, from, size);
     }
 
     //Добавление нового пользователя
     @PostMapping("/users")
     public UserDto addUser(@Validated({Create.class}) @RequestBody NewUserRequest newUserRequest) {
+        log.info("AdminController: POST /admin/users: addUser() newUserRequest = {}", newUserRequest);
         return adminService.addUser(newUserRequest);
     }
 
     //Удаление пользователя
     @DeleteMapping("/users/{userId}")
-    public UserDto deleteUser(@Positive @PathVariable Long userId) {
-        return adminService.deleteUser(userId);
+    public void deleteUser(@Positive @PathVariable Long userId) {
+        log.info("AdminController: DELETE /admin/users: deleteUser() userId = {}", userId);
+        adminService.deleteUser(userId);
+        return;
+
     }
 
 

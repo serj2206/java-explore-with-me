@@ -1,8 +1,11 @@
 package ru.practicum.ewmservice.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import ru.practicum.ewmservice.exceptions.BadRequestException;
+import ru.practicum.ewmservice.common.FromSizeRequest;
 import ru.practicum.ewmservice.model.category.Category;
 import ru.practicum.ewmservice.model.category.dto.CategoryDto;
 import ru.practicum.ewmservice.model.category.dto.NewCategoryDto;
@@ -11,14 +14,17 @@ import ru.practicum.ewmservice.model.compilation.dto.CompilationDto;
 import ru.practicum.ewmservice.model.compilation.dto.NewCompilationDto;
 import ru.practicum.ewmservice.model.event.dto.AdminUpdateEventRequest;
 import ru.practicum.ewmservice.model.event.dto.EventFullDto;
+import ru.practicum.ewmservice.model.user.User;
 import ru.practicum.ewmservice.model.user.dto.NewUserRequest;
 import ru.practicum.ewmservice.model.user.dto.UserDto;
+import ru.practicum.ewmservice.model.user.mapper.UserMapper;
 import ru.practicum.ewmservice.repository.CategoryRepository;
 import ru.practicum.ewmservice.repository.EventRepository;
 import ru.practicum.ewmservice.repository.RequestRepository;
 import ru.practicum.ewmservice.repository.UserRepository;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -43,6 +49,7 @@ public class AdminService {
 
     //Редактирование событий
     public EventFullDto updateEvent(long eventId, AdminUpdateEventRequest updateEvent) {
+        
         return null;
     }
 
@@ -88,25 +95,31 @@ public class AdminService {
     //Admin: Пользователи
 
     //Получении информации о пользователе
-    public List<UserDto> getUser(List<Integer> ids, int from, int size) {
+    public List<UserDto> getUser(List<Long> ids, int from, int size) {
 
-        //Возвращает информацию обо всех пользователях (учитываются параметры ограничения выборки),
-        // либо о конкретных (учитываются указанные идентификаторы)
-        return null;
+        List<UserDto> userDtoList;
+        Sort sortById = Sort.by(Sort.Direction.ASC, "id");
+        Pageable pageable = FromSizeRequest.of(from, size, sortById);
+
+        Page<User> usersPage = userRepository.findUsersById(ids, pageable);
+
+        userDtoList = usersPage.stream()
+                .map(UserMapper :: toUserDto)
+                .collect(Collectors.toList());
+
+        return userDtoList;
     }
 
     //Добавление нового пользователя
     public UserDto addUser(NewUserRequest newUserRequest) {
-
-
-        //Проверить уникальнось emal
-        return null;
+        User user = UserMapper.toUser(newUserRequest);
+        return UserMapper.toUserDto(userRepository.save(user));
     }
 
     //Удаление пользователя
-    public UserDto deleteUser(long userId) {
-
-        return null;
+    public void deleteUser(long userId) {
+        userRepository.deleteById(userId);
+        return;
     }
 
 
