@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.ewmservice.model.statistic.EndpointHitDto;
 
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -29,14 +30,14 @@ public class PublicClient extends BaseClient {
         return post("/hit", endpointHitDto);
     }
 
-    public ResponseEntity<Object> findStats(String start, String end, Integer from, Integer size) {
+    public ResponseEntity<Object> findStats(String start, String end, List<String> uris, Boolean unique) {
         Map<String, Object> parameters = Map.of(
                 "start", start,
                 "end", end,
-                "from", from,
-                "size", size
+                "uris", uris,
+                "unique", unique
         );
-        return get("?start={start}&end={end}&from={from}&size={size}", parameters);
+        return get("?start={start}&end={end}&uris={uris}&unique={unique}", parameters);
     }
 
 }

@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import ru.practicum.ewmservice.client.PublicClient;
 import ru.practicum.ewmservice.common.FromSizeRequest;
 import ru.practicum.ewmservice.model.category.Category;
 import ru.practicum.ewmservice.model.category.dto.CategoryDto;
@@ -12,8 +13,12 @@ import ru.practicum.ewmservice.model.category.dto.NewCategoryDto;
 import ru.practicum.ewmservice.model.category.mapper.CategoryMapper;
 import ru.practicum.ewmservice.model.compilation.dto.CompilationDto;
 import ru.practicum.ewmservice.model.compilation.dto.NewCompilationDto;
+import ru.practicum.ewmservice.model.event.Event;
 import ru.practicum.ewmservice.model.event.dto.AdminUpdateEventRequest;
 import ru.practicum.ewmservice.model.event.dto.EventFullDto;
+import ru.practicum.ewmservice.model.event.mapper.EventMapper;
+import ru.practicum.ewmservice.model.request.RequestStatus;
+import ru.practicum.ewmservice.model.statistic.ViewStats;
 import ru.practicum.ewmservice.model.user.User;
 import ru.practicum.ewmservice.model.user.dto.NewUserRequest;
 import ru.practicum.ewmservice.model.user.dto.UserDto;
@@ -23,6 +28,7 @@ import ru.practicum.ewmservice.repository.EventRepository;
 import ru.practicum.ewmservice.repository.RequestRepository;
 import ru.practicum.ewmservice.repository.UserRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,6 +40,7 @@ public class AdminService {
     private final EventRepository eventRepository;
     private final CategoryRepository categoryRepository;
     private final RequestRepository requestRepository;
+    private final PublicClient publicClient;
 
 
     //Поиск событий
@@ -49,8 +56,24 @@ public class AdminService {
 
     //Редактирование событий
     public EventFullDto updateEvent(long eventId, AdminUpdateEventRequest updateEvent) {
-        
-        return null;
+
+        Category category = categoryRepository.findById(updateEvent.getCategory()).orElseThrow();
+
+        Event event = EventMapper.toUpdateEvent(eventId, category, updateEvent);
+        Event eventUpdate = eventRepository.save(event);
+
+        LocalDateTime start = eventUpdate.getPublishedOn();
+        LocalDateTime end = eventUpdate.getEventDate();
+        List<String> uris = List.of("");
+        List<ViewStats> viewStatsList = (List<ViewStats>) publicClient.findStats(
+                start.toString(),
+                end.toString(),
+                uris,
+                true).getBody();
+        Integer views = viewStatsList.get(0).getHits();
+        Integer confirmedRequests = requestRepository.countByEventIdAndStatus(eventId, RequestStatus.CONFIRM);
+
+        return EventMapper.toEventFullDto(event, views, confirmedRequests);
     }
 
     //Публикация события

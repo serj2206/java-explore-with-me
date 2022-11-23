@@ -1,4 +1,4 @@
-package ru.practicum.statsserver.model.statsinfo.dto;
+package ru.practicum.statsserver.model.dto;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+
 public class EndpointHitDto {
 
     @NotNull(groups = {Create.class})
@@ -30,5 +31,5 @@ public class EndpointHitDto {
     private String ip;
 
     @NotNull(groups = {Create.class})
-    private LocalDateTime timestamp;
+    private String timestamp;
 }

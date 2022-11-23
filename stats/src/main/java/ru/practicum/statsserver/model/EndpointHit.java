@@ -1,4 +1,4 @@
-package ru.practicum.statsserver.model.statsinfo;
+package ru.practicum.statsserver.model;
 
 import lombok.*;
 
@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class EndpointHit {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

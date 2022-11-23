@@ -36,7 +36,7 @@ public class PrivateService {
     private final PublicClient publicClient;
 
 
-    //Public: События
+    //Pivate: События
 
     //Получение событий, добавленных текущим пользователем
     public List<EventShortDto> getEvent(long userId, int from, int size) {
@@ -75,7 +75,7 @@ public class PrivateService {
 
         ViewStats viewStats = (ViewStats) publicClient.findStats(
                         event.getPublishedOn().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
-                        event.getEventDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), 0, 1)
+                        event.getEventDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), null, true)
                 .getBody();
 
         Integer confirmedRequests = (int) requestRepository.count(); //Дописать запрос
@@ -113,7 +113,7 @@ public class PrivateService {
     }
 
 
-    //Public: Запросы на участие
+    //Private: Запросы на участие
 
     //Получение информации о заявках текущего пользователя на участие в чужих событиях
     public List<ParticipationRequestDto> getMyRequests(long userId) {
@@ -131,7 +131,7 @@ public class PrivateService {
         Если для события отключена пре-модерация запросов на участие,
         то запрос должен автоматически перейти в состояние подтвержденного
         */
-        Request request = requestRepository.findRequestById(reqId);
+        Request request = requestRepository.findById(reqId).orElseThrow();
 
         return null;
     }
@@ -139,7 +139,7 @@ public class PrivateService {
     //Отмена своего запроса на участие в событии
     public ParticipationRequestDto cancelRequest(long userId, long reqId) {
 
-        Request request = requestRepository.findRequestById(reqId);
+        Request request = requestRepository.findById(reqId).orElseThrow();
         return null;
     }
 }

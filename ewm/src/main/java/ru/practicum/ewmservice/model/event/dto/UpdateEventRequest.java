@@ -24,11 +24,11 @@ public class UpdateEventRequest {
 
     private String description;
 
-    private int category;
+    private Integer category;
 
-    private boolean paid;
+    private Boolean paid;
 
-    private int participantLimit;
+    private Integer participantLimit;
 
     private LocalDateTime eventDate;
 

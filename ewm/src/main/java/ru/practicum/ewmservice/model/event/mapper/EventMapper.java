@@ -4,8 +4,10 @@ import org.springframework.stereotype.Component;
 import ru.practicum.ewmservice.model.category.Category;
 import ru.practicum.ewmservice.model.event.Event;
 import ru.practicum.ewmservice.model.event.State;
+import ru.practicum.ewmservice.model.event.dto.AdminUpdateEventRequest;
 import ru.practicum.ewmservice.model.event.dto.EventFullDto;
 import ru.practicum.ewmservice.model.event.dto.NewEventDto;
+import ru.practicum.ewmservice.model.event.dto.UpdateEventRequest;
 import ru.practicum.ewmservice.model.user.User;
 
 import java.time.LocalDateTime;
@@ -32,6 +34,21 @@ public class EventMapper {
                 .createdOn(createdOn)
                 .state(State.PENDING)
                 .initiator(initiator)
+                .build();
+        return event;
+    }
+
+    public static Event toUpdateEvent(Long eventId, Category category, AdminUpdateEventRequest updateEventRequest) {
+
+        Event event = Event.builder()
+                .id(eventId)
+                .title(updateEventRequest.getTitle())
+                .annotation(updateEventRequest.getAnnotation())
+                .description(updateEventRequest.getDescription())
+                .category(category)
+                .paid(updateEventRequest.getPaid())
+                .participantLimit(updateEventRequest.getParticipantLimit())
+                .eventDate(updateEventRequest.getEventDate())
                 .build();
         return event;
     }
