@@ -2,6 +2,7 @@ package ru.practicum.ewmservice.model.request.dto;
 
 import lombok.*;
 import ru.practicum.ewmservice.model.event.Event;
+import ru.practicum.ewmservice.model.request.Request;
 import ru.practicum.ewmservice.model.request.RequestStatus;
 import ru.practicum.ewmservice.model.user.User;
 
@@ -16,13 +17,21 @@ import java.time.LocalDateTime;
 @Builder
 public class ParticipationRequestDto {
 
-    private long id;
+    private Long id;
 
-    private Event event;
+    private Long event;
 
-    private User requester;
+    private Long requester;
 
     private LocalDateTime created;
 
     private RequestStatus status;
+
+    public ParticipationRequestDto(Request request) {
+        this.id = request.getId();
+        this.event = request.getEvent().getId();
+        this.requester = request.getRequester().getId();
+        this.created = request.getCreated();
+        this.status = request.getStatus();
+    }
 }

@@ -98,4 +98,17 @@ public class ErrorHandler {
                 LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
     }
 
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ErrorResponse handleViolationRuleException(final ViolationRuleException e) {
+        log.warn("403 {}", e.getMessage());
+        List<String> errors = null;
+        return new ErrorResponse(
+                errors,
+                e.getMessage(),
+                "Неверный формат даты и времени",
+                HttpStatus.FORBIDDEN.toString(),
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+    }
+
 }

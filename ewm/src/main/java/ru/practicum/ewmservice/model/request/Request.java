@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 public class Request {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @ManyToOne
     @CollectionTable(name = "events",  joinColumns = @JoinColumn(name = "id"))
