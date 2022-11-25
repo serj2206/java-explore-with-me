@@ -1,9 +1,14 @@
 package ru.practicum.ewmservice.service;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewmservice.client.PublicClient;
 import ru.practicum.ewmservice.common.FromSizeRequest;
@@ -28,7 +33,10 @@ import ru.practicum.ewmservice.repository.EventRepository;
 import ru.practicum.ewmservice.repository.RequestRepository;
 import ru.practicum.ewmservice.repository.UserRepository;
 
+import java.io.IOException;
+import java.lang.reflect.Type;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -62,14 +70,10 @@ public class AdminService {
         Event event = EventMapper.toUpdateEvent(eventId, category, updateEvent);
         Event eventUpdate = eventRepository.save(event);
 
-        LocalDateTime start = eventUpdate.getPublishedOn();
-        LocalDateTime end = eventUpdate.getEventDate();
-        List<String> uris = List.of("");
-        List<ViewStats> viewStatsList = (List<ViewStats>) publicClient.findStats(
-                start.toString(),
-                end.toString(),
-                uris,
-                true).getBody();
+        String start = eventUpdate.getPublishedOn().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        String end = eventUpdate.getEventDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        String uris = "event/" + eventId;
+        List<ViewStats> viewStatsList = publicClient.findStats(start, end, uris, true);
         Integer views = viewStatsList.get(0).getHits();
         Integer confirmedRequests = requestRepository.countByEventIdAndStatus(eventId, RequestStatus.CONFIRM);
 
@@ -96,8 +100,6 @@ public class AdminService {
     //Изменение категории
     public CategoryDto updateCategory(CategoryDto categoryDto) {
         Category category = CategoryMapper.toCategory(categoryDto);
-
-        //Обратите внимание: имя категории должно быть уникальным
         return CategoryMapper.toCategoryDto(categoryRepository.save(category));
     }
 
@@ -110,14 +112,12 @@ public class AdminService {
     //Удаление категории
     public void deleteCategory(int catId) {
         categoryRepository.deleteById(catId);
-
-        //Обратите внимание: с категорией не должно быть связано ни одного события.
         return;
     }
 
     //Admin: Пользователи
 
-    //Получении информации о пользователе
+    //Получение информации о пользователе
     public List<UserDto> getUser(List<Long> ids, int from, int size) {
 
         List<UserDto> userDtoList;
@@ -127,7 +127,7 @@ public class AdminService {
         Page<User> usersPage = userRepository.findUsersById(ids, pageable);
 
         userDtoList = usersPage.stream()
-                .map(UserMapper :: toUserDto)
+                .map(UserMapper::toUserDto)
                 .collect(Collectors.toList());
 
         return userDtoList;
@@ -183,5 +183,4 @@ public class AdminService {
 
         return;
     }
-
 }

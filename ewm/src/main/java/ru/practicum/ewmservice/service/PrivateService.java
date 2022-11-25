@@ -1,8 +1,12 @@
 package ru.practicum.ewmservice.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewmservice.client.PublicClient;
+import ru.practicum.ewmservice.common.FromSizeRequest;
 import ru.practicum.ewmservice.exceptions.ViolationRuleException;
 import ru.practicum.ewmservice.exceptions.ValidationException;
 import ru.practicum.ewmservice.model.category.Category;
@@ -15,8 +19,10 @@ import ru.practicum.ewmservice.model.event.dto.UpdateEventRequest;
 import ru.practicum.ewmservice.model.event.mapper.EventMapper;
 import ru.practicum.ewmservice.model.request.Request;
 import ru.practicum.ewmservice.model.request.RequestStatus;
+import ru.practicum.ewmservice.model.event.dto.EventRequestCount;
 import ru.practicum.ewmservice.model.request.dto.ParticipationRequestDto;
-import ru.practicum.ewmservice.model.request.mapping.RequestMapping;
+import ru.practicum.ewmservice.model.request.dto.RequestDto;
+import ru.practicum.ewmservice.model.request.mapper.RequestMapper;
 import ru.practicum.ewmservice.model.statistic.ViewStats;
 import ru.practicum.ewmservice.model.user.User;
 import ru.practicum.ewmservice.repository.CategoryRepository;
@@ -27,8 +33,7 @@ import ru.practicum.ewmservice.validation.Validation;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -42,30 +47,105 @@ public class PrivateService {
     private final PublicClient publicClient;
 
 
-    //Pivate: События
+    //Private: События
 
     //Получение событий, добавленных текущим пользователем
     public List<EventShortDto> getEvent(long userId, int from, int size) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException(String.format("Пользователь c id = %d не найден", userId)));
+        List<EventShortDto> eventShortDtoList;
 
-        return null;
+        Sort sortById = Sort.by(Sort.Direction.ASC, "id");
+
+        Pageable pageable = FromSizeRequest.of(from, size, sortById);
+
+        Page<EventRequestCount> eventRequestCountPage = eventRepository.findEventByInitiatorId(userId, pageable);
+
+        return this.toEventShortDto(eventRequestCountPage);
+    }
+
+    private List<EventShortDto> toEventShortDto(Page<EventRequestCount> eventRequestCountPage) {
+
+        //Самая ранняя дата, когда было cоздано событие из списка событий
+        LocalDateTime start = eventRequestCountPage.stream()
+                .min(Comparator.comparing(erc -> erc.getEvent().getCreatedOn()))
+                .get()
+                .getEvent()
+                .getPublishedOn();
+
+        //Самая поздняя дата, когда состоится событие из списка событий
+        LocalDateTime end = eventRequestCountPage.stream()
+                .max(Comparator.comparing(erc -> erc.getEvent().getEventDate()))
+                .get()
+                .getEvent()
+                .getPublishedOn();
+
+        StringBuilder urisBuilder = new StringBuilder();
+        for (EventRequestCount erc : eventRequestCountPage) {
+            urisBuilder.append("/event/").append(erc.getEvent().getId()).append(", ");
+        }
+        String uris = urisBuilder.toString();
+
+        //Запрос списка статистической информации
+        List<ViewStats> viewStatsList = publicClient.findStats(
+                start.toString(),
+                end.toString(),
+                uris,
+                true);
+
+        List<EventShortDto> eventShortDtoList = new ArrayList<>();
+
+        for (EventRequestCount erc : eventRequestCountPage) {
+            Optional<ViewStats> viewStatsOptional = viewStatsList.stream()
+                    .filter(v -> v.getUri().contains(erc.getEvent().getId().toString()))
+                    .findAny();
+            int views = 0;
+            if (viewStatsOptional.isPresent()) {
+                views = viewStatsOptional.get().getHits();
+            }
+            eventShortDtoList.add(EventMapper.eventShortDto(erc, views));
+        }
+
+        return eventShortDtoList;
     }
 
     //Изменение события, добавленного текущим пользователем
     public EventFullDto updateEvent(long userId, UpdateEventRequest updateEventRequest) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException(String.format("Пользователь c id = %d не найден", userId)));
 
-        return null;
+        Category category = categoryRepository.findById(updateEventRequest.getCategory())
+                .orElseThrow(() -> new NoSuchElementException(String.format("Категория c id = %d не найдена", updateEventRequest.getCategory())));
+
+        Event eventUpdate = EventMapper.toUpdateEvent(category, updateEventRequest);
+
+        Event event = eventRepository.save(eventUpdate);
+        LocalDateTime start = eventUpdate.getPublishedOn();
+        LocalDateTime end = eventUpdate.getEventDate();
+        String uris = "/event/" + eventUpdate.getId();
+
+        List<ViewStats> viewStatsList = publicClient.findStats(
+                start.toString(),
+                end.toString(),
+                uris,
+                true);
+
+        Integer views = viewStatsList.get(0).getHits();
+        Integer confirmedRequests = requestRepository.countByEventIdAndStatus(eventUpdate.getId(), RequestStatus.CONFIRM);
+
+        return EventMapper.toEventFullDto(event, views, confirmedRequests);
     }
 
     //Добавление нового события
     public EventFullDto addEvent(long userId, NewEventDto newEventDto) {
 
-        User user = userRepository.findById(userId).orElseThrow();
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("Пользователь не найден"));
         Category category = categoryRepository.findById(newEventDto.getCategory()).orElseThrow();
         LocalDateTime createdOn = LocalDateTime.now();
         //дата и время на которые намечено событие не может быть раньше, чем через два часа от текущего момента
         Validation.eventDateValidation(newEventDto.getEventDate());
         Event event = EventMapper.toEvent(newEventDto, category, createdOn, user);
-
 
         return EventMapper.toEventFullDto(eventRepository.save(event), null, null);
     }
@@ -77,49 +157,144 @@ public class PrivateService {
                 .orElseThrow(() -> new NoSuchElementException("Пользователь не найден"));
 
         Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new NoSuchElementException("Событие не найден"));
+                .orElseThrow(() -> new NoSuchElementException("Событие не найдено"));
 
         if (userId != event.getInitiator().getId()) {
-            throw new ValidationException("Нет прав: событие принадлежит другому участнику");
+            throw new ValidationException("Нет прав: событие создано другим пользователю");
         }
+        Integer views = this.toViews(event, true);
 
-        ViewStats viewStats = (ViewStats) publicClient.findStats(
-                        event.getPublishedOn().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
-                        event.getEventDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), null, true)
-                .getBody();
+        Integer confirmedRequests = requestRepository.countByEventIdAndStatus(eventId, RequestStatus.CONFIRM);
 
-        Integer confirmedRequests = (int) requestRepository.count(); //Дописать запрос
+        return EventMapper.toEventFullDto(event, views, confirmedRequests);
+    }
 
-        return EventMapper.toEventFullDto(event, viewStats.getHits(), confirmedRequests);
+    private Integer toViews(Event event, Boolean unique) {
+        String uris = "/event/" + event.getId();
+
+        List<ViewStats> viewStatsList = publicClient.findStats(
+                event.getPublishedOn().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+                event.getEventDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), uris, unique);
+
+        if (viewStatsList == null) return null;
+        Integer views = 0;
+        for (ViewStats vs : viewStatsList) {
+            views += vs.getHits();
+        }
+        return views;
     }
 
     //Отмена события, добавленного текущим пользователем
     public EventFullDto canceledEventById(long userId, long eventId) {
         //Отменить можно только событие в состоянии ожидания модерации.
-        return null;
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("Пользователь не найден"));
+
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new NoSuchElementException("Событие не найдено"));
+        if (event.getInitiator().getId() != userId) {
+            throw new ViolationRuleException(
+                    String.format("Пользователь с id = %d не является инициатором события с id = %d", userId, eventId));
+        }
+        if (event.getState() != State.PENDING) {
+            event.setState(State.CANCELED);
+            event = eventRepository.save(event);
+        } else throw new ViolationRuleException(
+                String.format("Событие не может быть завершено, т.к. его статус = %s", event.getState().toString()));
+
+        Integer views = this.toViews(event, true);
+        Integer confirmedRequests = requestRepository.countByEventIdAndStatus(eventId, RequestStatus.CONFIRM);
+
+        return EventMapper.toEventFullDto(event, views, confirmedRequests);
     }
 
     //Получение информации о запросах на участие в событии текущего пользователя
-    public List<ParticipationRequestDto> getParticipationRequest(long userId, long eventId) {
+    public List<RequestDto> getParticipationRequest(long userId, long eventId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("Пользователь не найден"));
 
-        return null;
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new NoSuchElementException("Событие не найдено"));
+
+        if (event.getInitiator().getId() != userId) {
+            throw new ViolationRuleException(
+                    String.format("Пользователь с id = %d не является инициатором события с id = %d", userId, eventId));
+        }
+
+        List<Request> requestList = requestRepository.findRequestByEventId(eventId);
+
+        return requestList.stream()
+                .map(RequestMapper::toRequestDto)
+                .collect(Collectors.toList());
     }
 
     //Подтверждение чужой заявки на участие в событии текущего пользователя
-    public ParticipationRequestDto confirmParticipationRequest(long userId, long eventId, long reqId) {
+    public RequestDto confirmParticipationRequest(long userId, long eventId, long reqId) {
         /*
         Если для события лимит заявок равен 0 или отключена пре-модерация заявок, то подтверждение заявок не требуется.
-        Нельзя подтвердить заявку, если уже достигнут лимит по заявкам на данное событиею
+        Нельзя подтвердить заявку, если уже достигнут лимит по заявкам на данное событие
         Если при подтверждении данной заявки, лимит заявок для события исчерпан,
         то все неподтверждённые заявки необходимо отклонить
         */
-        return null;
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("Пользователь не найден"));
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new NoSuchElementException("Событие не найдено"));
+        Request request = requestRepository.findById(reqId)
+                .orElseThrow(() -> new NoSuchElementException("Запрос не найден"));
+
+        if (event.getInitiator().getId() != userId) {
+            throw new ValidationException("Нет прав: событие создано другим пользователю");
+        }
+        if (request.getEvent().getId() != eventId) {
+            throw new ValidationException(
+                    String.format("Запрос на участие с id = %d не принадлежит событию с id = %d", reqId, eventId));
+        }
+        if (event.isRequestModeration() || event.getParticipantLimit() == 0) {
+            throw new ValidationException(
+                    String.format("Подтверждение заявок на участие в событии с id = %d не требуется", eventId));
+        }
+
+        Integer confirmedRequests = requestRepository.countByEventIdAndStatus(eventId, RequestStatus.CONFIRM);
+        if (confirmedRequests < event.getParticipantLimit()) {
+            request.setStatus(RequestStatus.CONFIRM);
+            request = requestRepository.save(request);
+            confirmedRequests = requestRepository.countByEventIdAndStatus(eventId, RequestStatus.CONFIRM);
+
+            if (confirmedRequests == event.getParticipantLimit()) {
+                List<Request> requestList = requestRepository.findRequestByEventIdAndStatus(eventId, RequestStatus.PENDING);
+                for (Request req : requestList) {
+                    req.setStatus(RequestStatus.REJECTED);
+                }
+                requestRepository.saveAll(requestList);
+            }
+
+            return RequestMapper.toRequestDto(request);
+        } else {
+            throw new ValidationException(
+                    String.format("Для события с id = %d достигнут лимит участников", eventId));
+        }
     }
 
     //Отклонение чужой заявки на участие в событии текущего пользователя
-    public ParticipationRequestDto rejectParticipationRequest(long userId, long eventId, long reqId) {
+    public RequestDto rejectParticipationRequest(long userId, long eventId, long reqId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("Пользователь не найден"));
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new NoSuchElementException("Событие не найдено"));
+        Request request = requestRepository.findById(reqId)
+                .orElseThrow(() -> new NoSuchElementException("Запрос не найден"));
 
-        return null;
+        if (event.getInitiator().getId() != userId) {
+            throw new ValidationException("Нет прав: событие создано другим пользователю");
+        }
+        if (request.getEvent().getId() != eventId) {
+            throw new ValidationException(
+                    String.format("Запрос на участие с id = %d не принадлежит событию с id = %d", reqId, eventId));
+        }
+        request.setStatus(RequestStatus.REJECTED);
+        return RequestMapper.toRequestDto(requestRepository.save(request));
     }
 
 
@@ -130,7 +305,7 @@ public class PrivateService {
         userRepository.findById(userId);
         List<Request> requestList = requestRepository.findByRequesterId(userId);
         List<ParticipationRequestDto> participationRequestDtoList =
-                requestList.stream().map(RequestMapping::toParticipationRequestDto).collect(Collectors.toList());
+                requestList.stream().map(RequestMapper::toParticipationRequestDto).collect(Collectors.toList());
         return participationRequestDtoList;
     }
 
@@ -168,19 +343,19 @@ public class PrivateService {
             throw new ViolationRuleException(String
                     .format("Запрос на участие в событии с ID = %d пользователя с ID = %d уже есть", eventId, userId));
         }
-        if (requestCount >= event.getParticipantLimit()) {
+        if (event.getParticipantLimit() > 0 && requestCount == event.getParticipantLimit()) {
             //У события достигнут лимит запросов на участие - необходимо вернуть ошибку
             throw new ViolationRuleException("У события достигнут лимит запросов на участие");
         }
         //Если пре-модерация отсутствует - заявка подтверждается автоматически
         if (!event.isRequestModeration()) {
-            request = RequestMapping.toRequest(event, requester, LocalDateTime.now(), RequestStatus.CONFIRM);
-            return RequestMapping.toParticipationRequestDto(requestRepository.save(request));
+            request = RequestMapper.toRequest(event, requester, LocalDateTime.now(), RequestStatus.CONFIRM);
+            return RequestMapper.toParticipationRequestDto(requestRepository.save(request));
         }
 
         //Если пре-модерация присутствует - для заявки устанавливается статус PENDING
-        request = RequestMapping.toRequest(event, requester, LocalDateTime.now(), RequestStatus.PENDING);
-        return RequestMapping.toParticipationRequestDto(requestRepository.save(request));
+        request = RequestMapper.toRequest(event, requester, LocalDateTime.now(), RequestStatus.PENDING);
+        return RequestMapper.toParticipationRequestDto(requestRepository.save(request));
     }
 
     //Отмена своего запроса на участие в событии
@@ -191,6 +366,7 @@ public class PrivateService {
 
         Request request = requestRepository
                 .findById(reqId).orElseThrow(() -> new NoSuchElementException("Запрос не найден"));
+
         if (request.getRequester().getId() != userId) {
             //Нет прав: запрос принадлежит другому участнику
             throw new ViolationRuleException("Нет прав: запрос принадлежит другому участнику");
@@ -198,6 +374,6 @@ public class PrivateService {
 
         request.setStatus(RequestStatus.СANCELLED);
 
-        return RequestMapping.toParticipationRequestDto(requestRepository.save(request));
+        return RequestMapper.toParticipationRequestDto(requestRepository.save(request));
     }
 }

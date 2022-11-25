@@ -12,6 +12,7 @@ import ru.practicum.ewmservice.model.compilation.dto.CompilationDto;
 import ru.practicum.ewmservice.model.compilation.dto.NewCompilationDto;
 import ru.practicum.ewmservice.model.event.dto.AdminUpdateEventRequest;
 import ru.practicum.ewmservice.model.event.dto.EventFullDto;
+import ru.practicum.ewmservice.model.statistic.ViewStats;
 import ru.practicum.ewmservice.model.user.dto.NewUserRequest;
 import ru.practicum.ewmservice.model.user.dto.UserDto;
 import ru.practicum.ewmservice.service.AdminService;

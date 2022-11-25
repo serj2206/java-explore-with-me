@@ -33,11 +33,11 @@ public class EventShortDto {
     private int views;
 
     //Количество оформленных заявок
-    private int confirmedRequests;
+    private long confirmedRequests;
 
     private LocalDateTime eventDate;
 
-    public EventShortDto(Event event, int views, int confirmedRequests) {
+    public EventShortDto(Event event, int views, long confirmedRequests) {
         this.id = event.getId();
         this.title = event.getTitle();
         this.annotation = event.getAnnotation();
@@ -49,4 +49,19 @@ public class EventShortDto {
         this.confirmedRequests = confirmedRequests;
         this.eventDate = event.getEventDate();
     }
+
+    public EventShortDto(Event event, int confirmedRequests) {
+        this.id = event.getId();
+        this.title = event.getTitle();
+        this.annotation = event.getAnnotation();
+        this.description = event.getDescription();
+        this.categoryDto = new CategoryDto(event.getCategory());
+        this.initiator = new UserShortDto(event.getInitiator());
+        this.paid = event.isPaid();
+        this.views = views;
+        this.confirmedRequests = confirmedRequests;
+        this.eventDate = event.getEventDate();
+    }
+
+
 }

@@ -4,10 +4,7 @@ import org.springframework.stereotype.Component;
 import ru.practicum.ewmservice.model.category.Category;
 import ru.practicum.ewmservice.model.event.Event;
 import ru.practicum.ewmservice.model.event.State;
-import ru.practicum.ewmservice.model.event.dto.AdminUpdateEventRequest;
-import ru.practicum.ewmservice.model.event.dto.EventFullDto;
-import ru.practicum.ewmservice.model.event.dto.NewEventDto;
-import ru.practicum.ewmservice.model.event.dto.UpdateEventRequest;
+import ru.practicum.ewmservice.model.event.dto.*;
 import ru.practicum.ewmservice.model.user.User;
 
 import java.time.LocalDateTime;
@@ -16,6 +13,10 @@ import java.time.LocalDateTime;
 public class EventMapper {
     public static EventFullDto toEventFullDto(Event event, Integer views, Integer confirmedRequests){
         return new EventFullDto(event, views, confirmedRequests);
+    }
+
+    public static EventShortDto eventShortDto(EventRequestCount erc, int views) {
+        return new EventShortDto(erc.getEvent(), views, erc.getRequestConfirmCount());
     }
 
     public static Event toEvent(NewEventDto newEventDto, Category category, LocalDateTime createdOn, User initiator) {
@@ -52,4 +53,22 @@ public class EventMapper {
                 .build();
         return event;
     }
+
+    public static Event toUpdateEvent(Category category, UpdateEventRequest updateEventRequest) {
+        Event event = Event.builder()
+                .id(updateEventRequest.getEventId())
+                .title(updateEventRequest.getTitle())
+                .annotation(updateEventRequest.getAnnotation())
+                .description(updateEventRequest.getDescription())
+                .category(category)
+                .paid(updateEventRequest.getPaid())
+                .participantLimit(updateEventRequest.getParticipantLimit())
+                .eventDate(updateEventRequest.getEventDate())
+                .build();
+        return event;
+    }
+
+
+
+
 }

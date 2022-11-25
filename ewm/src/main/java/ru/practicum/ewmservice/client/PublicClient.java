@@ -8,6 +8,7 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.ewmservice.model.statistic.EndpointHitDto;
+import ru.practicum.ewmservice.model.statistic.ViewStats;
 
 import java.util.List;
 import java.util.Map;
@@ -30,14 +31,16 @@ public class PublicClient extends BaseClient {
         return post("/hit", endpointHitDto);
     }
 
-    public ResponseEntity<Object> findStats(String start, String end, List<String> uris, Boolean unique) {
+    public List<ViewStats> findStats(String start, String end, String uris, Boolean unique) {
         Map<String, Object> parameters = Map.of(
                 "start", start,
                 "end", end,
-                "uris", uris,
+                "uris", uris.toString(),
                 "unique", unique
         );
-        return get("?start={start}&end={end}&uris={uris}&unique={unique}", parameters);
+        ResponseEntity<Object> entity = get("/stats?start={start}&end={end}&uris={uris}&unique={unique}", parameters);
+        List<ViewStats> viewStatsList = (List<ViewStats>) entity.getBody();
+        return viewStatsList;
     }
 
 }

@@ -8,6 +8,7 @@ import ru.practicum.ewmservice.model.event.dto.EventShortDto;
 import ru.practicum.ewmservice.model.event.dto.NewEventDto;
 import ru.practicum.ewmservice.model.event.dto.UpdateEventRequest;
 import ru.practicum.ewmservice.model.request.dto.ParticipationRequestDto;
+import ru.practicum.ewmservice.model.request.dto.RequestDto;
 import ru.practicum.ewmservice.service.PrivateService;
 
 import javax.validation.constraints.Positive;
@@ -67,15 +68,15 @@ public class PrivateController {
 
     //Получение информации о запросах на участие в событии текущего пользователя
     @GetMapping("/{userId}/events/{eventId}/requests")
-    public List<ParticipationRequestDto> getParticipationRequest(@Positive @PathVariable Long userId,
-                                                                 @Positive @PathVariable Long eventId) {
+    public List<RequestDto> getParticipationRequest(@Positive @PathVariable Long userId,
+                                                    @Positive @PathVariable Long eventId) {
 
         return privateService.getParticipationRequest(userId, eventId);
     }
 
     //Подтверждение чужой заявки на участие в событии текущего пользователя
     @GetMapping("/{userId}/events/{eventId}/requests/{reqId}/confirm")
-    public ParticipationRequestDto confirmParticipationRequest(@Positive @PathVariable Long userId,
+    public RequestDto confirmParticipationRequest(@Positive @PathVariable Long userId,
                                                                @Positive @PathVariable Long eventId,
                                                                @Positive @PathVariable Long reqId) {
 
@@ -84,7 +85,7 @@ public class PrivateController {
 
     //Отклонение чужой заявки на участие в событии текщего пользователя
     @PatchMapping("/{userId}/events/{eventId}/requests/{reqId}/reject")
-    public ParticipationRequestDto rejectParticipationRequest(@Positive @PathVariable Long userId,
+    public RequestDto rejectParticipationRequest(@Positive @PathVariable Long userId,
                                                               @Positive @PathVariable Long eventId,
                                                               @Positive @PathVariable Long reqId) {
 
