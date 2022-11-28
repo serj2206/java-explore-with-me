@@ -1,13 +1,10 @@
 package ru.practicum.statsserver.model.dto;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-
-
 import lombok.*;
 import ru.practicum.statsserver.common.marker.Create;
 
-import java.time.LocalDateTime;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @EqualsAndHashCode
 @ToString

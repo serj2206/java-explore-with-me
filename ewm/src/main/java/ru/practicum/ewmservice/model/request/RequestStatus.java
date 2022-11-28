@@ -2,8 +2,8 @@ package ru.practicum.ewmservice.model.request;
 
 public enum RequestStatus {
     PENDING, //Ожидающий
-    CONFIRM,//Утвержден
+    CONFIRMED,//Утвержден
     REJECTED, //Отклонен
 
-    СANCELLED //Отменен
+    CANCELED  //Отменен
 }

@@ -23,45 +23,49 @@ public class EventShortDto {
 
     private String description;
 
-    private CategoryDto categoryDto;
+    private CategoryDto category;
 
     private UserShortDto initiator;
 
     private boolean paid;
 
     //Количество просмотров
-    private int views;
+    private Integer views;
 
     //Количество оформленных заявок
-    private long confirmedRequests;
+    private Long confirmedRequests;
 
     private LocalDateTime eventDate;
 
-    public EventShortDto(Event event, int views, long confirmedRequests) {
+    public EventShortDto(Event event, Integer views, Long confirmedRequests) {
         this.id = event.getId();
         this.title = event.getTitle();
         this.annotation = event.getAnnotation();
         this.description = event.getDescription();
-        this.categoryDto = new CategoryDto(event.getCategory());
+        this.category = new CategoryDto(event.getCategory());
         this.initiator = new UserShortDto(event.getInitiator());
-        this.paid = event.isPaid();
+        this.paid = event.getPaid();
         this.views = views;
         this.confirmedRequests = confirmedRequests;
         this.eventDate = event.getEventDate();
     }
 
-    public EventShortDto(Event event, int confirmedRequests) {
+    public EventShortDto(Event event, Long confirmedRequests) {
         this.id = event.getId();
         this.title = event.getTitle();
         this.annotation = event.getAnnotation();
         this.description = event.getDescription();
-        this.categoryDto = new CategoryDto(event.getCategory());
+        this.category = new CategoryDto(event.getCategory());
         this.initiator = new UserShortDto(event.getInitiator());
-        this.paid = event.isPaid();
-        this.views = views;
+        this.paid = event.getPaid();
+        this.views = null;
         this.confirmedRequests = confirmedRequests;
         this.eventDate = event.getEventDate();
     }
+
+
+
+
 
 
 }

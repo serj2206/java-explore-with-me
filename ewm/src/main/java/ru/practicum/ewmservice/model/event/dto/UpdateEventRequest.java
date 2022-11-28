@@ -1,11 +1,9 @@
 package ru.practicum.ewmservice.model.event.dto;
 
 import lombok.*;
-
 import ru.practicum.ewmservice.common.marker.Update;
 
 import javax.validation.constraints.Positive;
-import java.time.LocalDateTime;
 
 @EqualsAndHashCode
 @ToString
@@ -28,8 +26,8 @@ public class UpdateEventRequest {
 
     private Boolean paid;
 
-    private Integer participantLimit;
+    private Long participantLimit;
 
-    private LocalDateTime eventDate;
+    private String eventDate;
 
 }

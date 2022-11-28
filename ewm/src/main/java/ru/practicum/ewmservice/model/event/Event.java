@@ -1,15 +1,11 @@
 package ru.practicum.ewmservice.model.event;
 
-
 import lombok.*;
 import ru.practicum.ewmservice.model.category.Category;
-import ru.practicum.ewmservice.model.compilation.Compilation;
 import ru.practicum.ewmservice.model.user.User;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "events")
@@ -48,11 +44,11 @@ public class Event {
 
     //Широта
     @Column(name = "lat")
-    private float lat;
+    private Float lat;
 
     //Долгота
     @Column(name = "lon")
-    private float lon;
+    private Float lon;
 
     //Cостояние жизненного цикла события
     @Column(name = "state")
@@ -61,11 +57,11 @@ public class Event {
 
     //Нужно ли оплачивать участие
     @Column(name = "paid")
-    private boolean paid;
+    private Boolean paid;
 
     //Ограничение на количество участников. Значение 0 - означает отсутствие ограничения
     @Column(name = "participant_limit")
-    private int participantLimit;
+    private Long participantLimit;
 
     //Дата и время публикации события (в формате "yyyy-MM-dd HH:mm:ss")
     @Column(name = "published_on")
@@ -75,18 +71,12 @@ public class Event {
     @Column(name = "created_on")
     private LocalDateTime createdOn;
 
-    //Подборки
-    @ManyToMany
-    @JoinTable(name = "compilation_id")
-    private List<Compilation> compilationList = new ArrayList<>();
-
     //Пре-модерация заявок на участие
     @Column(name = "request_moderation")
-    private boolean requestModeration;
+    private Boolean requestModeration;
 
     //Дата и время на которые намечено событие (в формате "yyyy-MM-dd HH:mm:ss")
     @Column(name = "event_date")
     private LocalDateTime eventDate;
-
 
 }

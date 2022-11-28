@@ -13,6 +13,7 @@ import ru.practicum.ewmservice.model.user.User;
 public class UserShortDto {
     long id;
     String name;
+
     public UserShortDto(User user) {
         this.id = user.getId();
         this.name = user.getName();

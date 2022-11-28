@@ -3,8 +3,6 @@ package ru.practicum.ewmservice.model.event.dto;
 import lombok.*;
 import ru.practicum.ewmservice.model.location.Location;
 
-import java.time.LocalDateTime;
-
 @EqualsAndHashCode
 @ToString
 @Getter
@@ -19,13 +17,13 @@ public class AdminUpdateEventRequest {
 
     private String description;
 
-    private LocalDateTime eventDate;
+    private String eventDate;
 
     private Location location;
 
     private Boolean paid;
 
-    private Integer participantLimit;
+    private Long participantLimit;
 
     private Boolean requestModeration;
 

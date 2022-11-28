@@ -14,12 +14,12 @@ import javax.persistence.*;
 public class Location {
 
     //Широта
-    private float lat;
+    private Float lat;
 
     //Долгота
-    private float lon;
+    private Float lon;
 
-    public Location(float lat, float lon) {
+    public Location(Float lat, Float lon) {
         this.lat = lat;
         this.lon = lon;
     }

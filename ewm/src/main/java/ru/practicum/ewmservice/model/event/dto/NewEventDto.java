@@ -1,14 +1,12 @@
 package ru.practicum.ewmservice.model.event.dto;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
-
 import lombok.*;
 import ru.practicum.ewmservice.common.marker.Create;
 import ru.practicum.ewmservice.model.location.Location;
 
-import java.time.LocalDateTime;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 
 @EqualsAndHashCode
 @ToString
@@ -39,9 +37,9 @@ public class NewEventDto {
     private Location location;
 
     @NotNull(groups = {Create.class})
-    private LocalDateTime eventDate;
+    private String eventDate;
 
-    private Boolean requestModeration;
+    private boolean requestModeration;
 
-    private Integer participantLimit;
+    private Long participantLimit;
 }

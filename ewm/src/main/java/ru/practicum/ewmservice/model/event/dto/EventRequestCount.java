@@ -11,5 +11,6 @@ import ru.practicum.ewmservice.model.event.Event;
 @NoArgsConstructor
 public class EventRequestCount {
     private Event event;
+
     private Long requestConfirmCount;
 }

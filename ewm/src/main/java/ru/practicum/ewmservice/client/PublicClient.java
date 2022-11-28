@@ -31,11 +31,11 @@ public class PublicClient extends BaseClient {
         return post("/hit", endpointHitDto);
     }
 
-    public List<ViewStats> findStats(String start, String end, String uris, Boolean unique) {
+    public List<ViewStats> findStats(String start, String end, String uris, boolean unique) {
         Map<String, Object> parameters = Map.of(
                 "start", start,
                 "end", end,
-                "uris", uris.toString(),
+                "uris", uris,
                 "unique", unique
         );
         ResponseEntity<Object> entity = get("/stats?start={start}&end={end}&uris={uris}&unique={unique}", parameters);

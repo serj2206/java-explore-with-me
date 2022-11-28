@@ -14,11 +14,11 @@ public class RequestMapper {
         return new Request(null, event, requester, created, requestStatus);
     }
 
-    public static ParticipationRequestDto toParticipationRequestDto (Request request) {
+    public static ParticipationRequestDto toParticipationRequestDto(Request request) {
         return new ParticipationRequestDto(request);
     }
 
-    public static RequestDto toRequestDto (Request request) {
+    public static RequestDto toRequestDto(Request request) {
         return new RequestDto(request);
     }
 }

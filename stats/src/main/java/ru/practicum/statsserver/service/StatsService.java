@@ -11,7 +11,6 @@ import ru.practicum.statsserver.repository.StatisticsRepository;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +31,7 @@ public class StatsService {
 
         if (!unique) {
             viewStatsList = statisticsRepository.findNotUniqueIP(startDateTime, endDateTime, uris);
-        } else if(unique) {
+        } else if (unique) {
             viewStatsList = statisticsRepository.findUniqueIp(startDateTime, endDateTime, uris);
         }
         return viewStatsList;

@@ -7,7 +7,7 @@ import ru.practicum.ewmservice.model.event.State;
 import ru.practicum.ewmservice.model.location.Location;
 import ru.practicum.ewmservice.model.user.dto.UserShortDto;
 
-import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @EqualsAndHashCode
 @ToString
@@ -25,7 +25,7 @@ public class EventFullDto {
 
     private String description;
 
-    private CategoryDto categoryDto;
+    private CategoryDto category;
 
     private UserShortDto initiator;
 
@@ -35,38 +35,44 @@ public class EventFullDto {
 
     private Boolean paid;
 
-    private Integer participantLimit;
+    private Long participantLimit;
 
-    private LocalDateTime publishedOn;
+    private String publishedOn;
 
-    private LocalDateTime createdOn;
+    private String createdOn;
 
     //Количество просмотров
     private Integer views;
 
     //Количество оформленных заявок
-    private Integer confirmedRequests;
+    private Long confirmedRequests;
 
     private Boolean requestModeration;
 
-    private LocalDateTime eventDate;
+    private String eventDate;
 
-    public EventFullDto(Event event, Integer views, Integer confirmedRequests) {
+    public EventFullDto(Event event, Integer views, Long confirmedRequests) {
         this.id = event.getId();
         this.title = event.getTitle();
         this.annotation = event.getAnnotation();
         this.description = event.getDescription();
-        this.categoryDto = new CategoryDto(event.getCategory());
+        this.category = new CategoryDto(event.getCategory());
         this.initiator = new UserShortDto(event.getInitiator());
         this.location = new Location(event.getLat(), event.getLon());
         this.state = event.getState();
-        this.paid = event.isPaid();
+        this.paid = event.getPaid();
         this.participantLimit = event.getParticipantLimit();
-        this.publishedOn = event.getPublishedOn();
-        this.createdOn = event.getCreatedOn();
+        if (event.getPublishedOn() != null) {
+            this.publishedOn = event.getPublishedOn().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        }
+        if (event.getCreatedOn() != null) {
+            this.createdOn = event.getCreatedOn().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        }
         this.views = views;
         this.confirmedRequests = confirmedRequests;
-        this.requestModeration = event.isRequestModeration();
-        this.eventDate = event.getEventDate();
+        this.requestModeration = event.getRequestModeration();
+        if (event.getEventDate() != null) {
+            this.eventDate = event.getEventDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        }
     }
 }

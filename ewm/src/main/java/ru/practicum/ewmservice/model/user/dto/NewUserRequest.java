@@ -2,12 +2,10 @@ package ru.practicum.ewmservice.model.user.dto;
 
 import lombok.*;
 import ru.practicum.ewmservice.common.marker.Create;
-import ru.practicum.ewmservice.common.marker.Update;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 
 @EqualsAndHashCode
 @ToString
