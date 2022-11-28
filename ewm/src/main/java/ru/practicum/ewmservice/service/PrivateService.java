@@ -68,7 +68,7 @@ public class PrivateService {
         for (Event event : events) {
             Optional<EventRequestCount> ercOptional = erc
                     .stream()
-                    .filter(er -> er.getEvent().getId() == event.getId())
+                    .filter(er -> er.getEvent().getId().equals(event.getId()))
                     .findAny();
             if (ercOptional.isPresent()) {
                 eventShortDtoList.add(EventMapper.toEventShortDto(event, null, ercOptional.get().getRequestConfirmCount()));
@@ -224,7 +224,7 @@ public class PrivateService {
             throw new ViolationRuleException(
                     String.format("Запрос на участие с id = %d не принадлежит событию с id = %d", reqId, eventId));
         }
-        if (event.getPublishedOn().equals(false)) {
+        if (!event.getState().equals(State.PUBLISHED)) {
             throw new ViolationRuleException(String.format("Событие с id = %d не опубликовано", eventId));
         }
 
@@ -327,7 +327,7 @@ public class PrivateService {
             throw new ViolationRuleException(String
                     .format("Запрос на участие в событии с ID = %d пользователя с ID = %d уже есть", eventId, userId));
         }
-        if (event.getParticipantLimit() > 0 && requestCount == event.getParticipantLimit()) {
+        if (event.getParticipantLimit() > 0 && requestCount.equals(event.getParticipantLimit())) {
             //У события достигнут лимит запросов на участие - необходимо вернуть ошибку
             throw new ViolationRuleException("У события достигнут лимит запросов на участие");
         }

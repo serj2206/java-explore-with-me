@@ -129,7 +129,7 @@ public class AdminService {
         for (Event event : events) {
             Optional<EventRequestCount> ercOptional = erc
                     .stream()
-                    .filter(er -> er.getEvent().getId() == event.getId())
+                    .filter(er -> er.getEvent().getId().equals(event.getId()))
                     .findAny();
             if (ercOptional.isPresent()) {
                 eventFullDtoList.add(EventMapper.toEventFullDto(event, null, ercOptional.get().getRequestConfirmCount()));
@@ -295,7 +295,7 @@ public class AdminService {
         for (Event event : events) {
             Optional<EventRequestCount> ercOptional = erc
                     .stream()
-                    .filter(er -> er.getEvent().getId() == event.getId())
+                    .filter(er -> er.getEvent().getId().equals(event.getId()))
                     .findAny();
             if (ercOptional.isPresent()) {
                 eventShortDtoList.add(EventMapper.toEventShortDto(event, null, ercOptional.get().getRequestConfirmCount()));
