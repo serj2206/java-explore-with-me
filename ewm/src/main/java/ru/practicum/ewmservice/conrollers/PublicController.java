@@ -87,7 +87,7 @@ public class PublicController {
 
     //Получение подборок событий
     @GetMapping("/compilations")
-    public CompilationDto searchCompilation(@RequestParam boolean pinned,
+    public List<CompilationDto> searchCompilation(@RequestParam boolean pinned,
                                             @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
                                             @Positive @RequestParam(defaultValue = "10") Integer size) {
         log.info("PublicController: GET /compilations: searchCompilation() pinned = {}, from = {}, size = {}",

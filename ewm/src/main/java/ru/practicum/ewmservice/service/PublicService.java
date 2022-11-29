@@ -85,7 +85,7 @@ public class PublicService {
         if (categories != null) {
             conditions.add(QEvent.event.category.id.in(categories));
         }
-        if (onlyAvailable == true) {
+        if (onlyAvailable.equals(true)) {
             conditions.add(QEvent.event.participantLimit
                     .gt(requestRepository.count(QRequest.request.event.eq(QEvent.event)
                             .and(QRequest.request.status.eq(RequestStatus.CONFIRMED)))));
@@ -136,8 +136,15 @@ public class PublicService {
     }
 
     @Transactional
-    public CompilationDto searchCompilation(boolean pinned, int from, int size) {
-        return null;
+    public List<CompilationDto> searchCompilation(boolean pinned, int from, int size) {
+        Sort sortById = Sort.by(Sort.Direction.ASC, "id");
+        Pageable pageable = FromSizeRequest.of(from, size, sortById);
+        Page<Compilation> compilationPage = compilationRepository.findCompilationByPinned(pinned, pageable);
+
+        return compilationPage
+                .stream()
+                .map(this::toCompilationDto)
+                .collect(Collectors.toList());
     }
 
     public CompilationDto findCompilationById(Long comId) {
