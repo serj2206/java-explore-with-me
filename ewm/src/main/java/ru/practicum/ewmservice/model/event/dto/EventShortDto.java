@@ -5,7 +5,6 @@ import ru.practicum.ewmservice.model.category.dto.CategoryDto;
 import ru.practicum.ewmservice.model.event.Event;
 import ru.practicum.ewmservice.model.user.dto.UserShortDto;
 
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 @EqualsAndHashCode
