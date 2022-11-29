@@ -38,8 +38,7 @@ public class StatsService {
         String start = eventShortDtoList.stream()
                 .min(Comparator.comparing(even -> even.getEventDate()))
                 .get()
-                .getEventDate()
-                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+                .getEventDate();                ;
 
         String end = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 

@@ -115,24 +115,27 @@ public class PublicService {
                 .get();
 
         Page<Event> eventPage = eventRepository.findAll(finalCondition, pageable);
-        List<EventShortDto> eventShortDtoList = this.toEventShortDtoList(eventPage.toList());
+
 
         if (sort != null) {
             if (sort.equals("EVENT_DATE")) {
-                return eventShortDtoList.stream()
+                List<Event> events = eventPage.stream()
                         .sorted((e1, e2) -> {
                             if (e1.getEventDate().isBefore(e2.getEventDate())) return 1;
                             else return -1;
                         })
                         .collect(Collectors.toList());
+                return this.toEventShortDtoList(events);
             }
             if (sort.equals("VIEWS")) {
+                List<EventShortDto> eventShortDtoList = this.toEventShortDtoList(eventPage.toList());
                 return eventShortDtoList.stream()
                         .sorted((e1, e2) -> (int) (e1.getViews() - e2.getViews()))
                         .collect(Collectors.toList());
+
             }
         }
-        return eventShortDtoList;
+        return new ArrayList<>();
     }
 
     @Transactional

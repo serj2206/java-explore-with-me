@@ -6,6 +6,7 @@ import ru.practicum.ewmservice.model.event.Event;
 import ru.practicum.ewmservice.model.user.dto.UserShortDto;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @EqualsAndHashCode
 @ToString
@@ -35,7 +36,7 @@ public class EventShortDto {
     //Количество оформленных заявок
     private Long confirmedRequests;
 
-    private LocalDateTime eventDate;
+    private String eventDate;
 
     public EventShortDto(Event event, Integer views, Long confirmedRequests) {
         this.id = event.getId();
@@ -47,7 +48,7 @@ public class EventShortDto {
         this.paid = event.getPaid();
         this.views = views;
         this.confirmedRequests = confirmedRequests;
-        this.eventDate = event.getEventDate();
+        this.eventDate = event.getEventDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
     }
 
     public EventShortDto(Event event, Long confirmedRequests) {
@@ -60,7 +61,7 @@ public class EventShortDto {
         this.paid = event.getPaid();
         this.views = null;
         this.confirmedRequests = confirmedRequests;
-        this.eventDate = event.getEventDate();
+        this.eventDate = event.getEventDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));;
     }
 
 

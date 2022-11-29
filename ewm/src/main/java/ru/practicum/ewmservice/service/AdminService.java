@@ -328,7 +328,6 @@ public class AdminService {
     @Transactional
     public void deleteCompilation(Long compId) {
         compilationRepository.deleteById(compId);
-        return;
     }
 
     //Удалить событие из подборки
