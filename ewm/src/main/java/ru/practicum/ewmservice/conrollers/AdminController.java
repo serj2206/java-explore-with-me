@@ -55,7 +55,7 @@ public class AdminController {
         return adminService.updateEvent(eventId, updateEvent);
     }
 
-    //Публикация события
+    //Публикация события publish
     @PatchMapping("/events/{eventId}/publish")
     public EventFullDto publicationEvent(@Positive @PathVariable Long eventId) {
         log.info("AdminController: PATCH /admin/events/{}/publish: publicationEvent() eventId = {}",
