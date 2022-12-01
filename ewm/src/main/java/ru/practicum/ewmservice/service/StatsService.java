@@ -3,6 +3,8 @@ package ru.practicum.ewmservice.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewmservice.client.PublicClient;
+import ru.practicum.ewmservice.exceptions.ClassErrorException;
+import ru.practicum.ewmservice.exceptions.ViolationRuleException;
 import ru.practicum.ewmservice.model.event.Event;
 import ru.practicum.ewmservice.model.event.dto.EventFullDto;
 import ru.practicum.ewmservice.model.event.dto.EventShortDto;
@@ -35,10 +37,15 @@ public class StatsService {
     }
 
     public List<ViewStats> getViewsStatsListByEventShort(List<EventShortDto> eventShortDtoList) {
+
+        if (eventShortDtoList.size() == 0) {
+            throw new ViolationRuleException("Некорректный вызов метода сервиса статистики");
+        }
+
         String start = eventShortDtoList.stream()
-                .min(Comparator.comparing(even -> even.getEventDate()))
-                .get()
-                .getEventDate();                ;
+                .min(Comparator.comparing(EventShortDto::getEventDate))
+                .orElseThrow(() -> new ClassErrorException("В экземпляре класса Event не обнаружены дата и время создания"))
+                .getEventDate();
 
         String end = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
@@ -48,18 +55,21 @@ public class StatsService {
         }
         String uris = urisBuilder.toString();
         //Запрос списка статистической информации
-        List<ViewStats> viewStatsList = publicClient.findStats(
+        return publicClient.findStats(
                 start,
                 end,
                 uris,
                 true);
-        return viewStatsList;
     }
 
     public List<ViewStats> getViewsStatsListByEventFull(List<EventFullDto> eventFullDtoList) {
+        if (eventFullDtoList.size() == 0) {
+            throw new ViolationRuleException("Некорректный вызов метода сервиса статистики");
+        }
+
         String start = eventFullDtoList.stream()
-                .min(Comparator.comparing(even -> even.getEventDate()))
-                .get()
+                .min(Comparator.comparing(EventFullDto::getEventDate))
+                .orElseThrow(() -> new ClassErrorException("В экземпляре класса Event не обнаружены дата и время создания"))
                 .getEventDate();
 
         String end = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
@@ -70,11 +80,11 @@ public class StatsService {
         }
         String uris = urisBuilder.toString();
         //Запрос списка статистической информации
-        List<ViewStats> viewStatsList = publicClient.findStats(
+        return publicClient.findStats(
                 start,
                 end,
                 uris,
                 true);
-        return viewStatsList;
     }
+
 }

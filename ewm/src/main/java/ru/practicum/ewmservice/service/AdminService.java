@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewmservice.common.FromSizeRequest;
 
 import ru.practicum.ewmservice.exceptions.BadRequestException;
+import ru.practicum.ewmservice.exceptions.ClassErrorException;
 import ru.practicum.ewmservice.exceptions.ViolationRuleException;
 import ru.practicum.ewmservice.model.category.Category;
 import ru.practicum.ewmservice.model.category.dto.CategoryDto;
@@ -114,11 +115,10 @@ public class AdminService {
 
         BooleanExpression finalCondition = conditions.stream()
                 .reduce(BooleanExpression::and)
-                .get();
+                .orElseThrow(() -> new ClassErrorException("Не корректная работа метода сервиса для не зарегистрированных пользователей"));
 
-        Page<Event> eventPage = eventRepository.findAll(finalCondition, pageable);
-        List<Event> events = eventPage.toList();
-        return this.toEventFullDtoList(events);
+
+        return this.toEventFullDtoList(eventRepository.findAll(finalCondition, pageable).toList());
     }
 
     private List<EventFullDto> toEventFullDtoList(List<Event> events) {
@@ -161,9 +161,9 @@ public class AdminService {
 
         Category category = categoryRepository.findById(adminUpdateEventRequest.getCategory()).orElseThrow();
         Event eventDb = eventRepository.findById(eventId)
-                .orElseThrow(() -> new NoSuchElementException(String.format("Событие не найдено")));
+                .orElseThrow(() -> new NoSuchElementException("Событие не найдено"));
 
-        Event updateEvent = EventMapper.toUpdateEvent(eventId, category, adminUpdateEventRequest, eventDb);
+        Event updateEvent = EventMapper.toUpdateEvent(category, adminUpdateEventRequest, eventDb);
         Event event = eventRepository.save(updateEvent);
 
         Integer views = statsService.getViewsForOneEvent(event, true);
@@ -237,7 +237,6 @@ public class AdminService {
     @Transactional
     public void deleteCategory(int catId) {
         categoryRepository.deleteById(catId);
-        return;
     }
 
     //Admin: Пользователи
@@ -246,31 +245,26 @@ public class AdminService {
     @Transactional(readOnly = true)
     public List<UserDto> getUser(List<Long> ids, int from, int size) {
 
-        List<UserDto> userDtoList;
         Sort sortById = Sort.by(Sort.Direction.ASC, "id");
         Pageable pageable = FromSizeRequest.of(from, size, sortById);
 
         Page<User> usersPage = userRepository.findUsersById(ids, pageable);
 
-        userDtoList = usersPage.stream()
+        return usersPage.stream()
                 .map(UserMapper::toUserDto)
                 .collect(Collectors.toList());
-
-        return userDtoList;
     }
 
     //Добавление нового пользователя
     @Transactional
     public UserDto addUser(NewUserRequest newUserRequest) {
-        User user = UserMapper.toUser(newUserRequest);
-        return UserMapper.toUserDto(userRepository.save(user));
+        return UserMapper.toUserDto(userRepository.save(UserMapper.toUser(newUserRequest)));
     }
 
     //Удаление пользователя
     @Transactional
     public void deleteUser(long userId) {
         userRepository.deleteById(userId);
-        return;
     }
 
 
@@ -280,10 +274,9 @@ public class AdminService {
     @Transactional
     public CompilationDto addCompilation(NewCompilationDto newCompilationDto) {
         List<Event> events = eventRepository.findAllById(newCompilationDto.getEvents());
-        Compilation compilationNew = compilationRepository
-                .save(CompilationMapper.toCompilation(newCompilationDto, events));
 
-        return this.toCompilationDto(compilationNew);
+        return this.toCompilationDto(compilationRepository
+                .save(CompilationMapper.toCompilation(newCompilationDto, events)));
     }
 
     private CompilationDto toCompilationDto(Compilation compilation) {
@@ -358,7 +351,6 @@ public class AdminService {
                 .orElseThrow(() -> new NoSuchElementException("Подборка не найдена"));
         compilation.setPinned(false);
         compilationRepository.save(compilation);
-        return;
     }
 
     //Закрепить подборку на главной странице
@@ -368,6 +360,5 @@ public class AdminService {
                 .orElseThrow(() -> new NoSuchElementException("Подборка не найдена"));
         compilation.setPinned(true);
         compilationRepository.save(compilation);
-        return;
     }
 }

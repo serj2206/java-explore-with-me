@@ -21,19 +21,16 @@ public class StatsService {
     public void addStats(EndpointHitDto endpointHitDto) {
         EndpointHit endpointHit = EndpointMapper.toEndpointHit(endpointHitDto);
         statisticsRepository.save(endpointHit);
-        return;
     }
 
     public List<ViewStats> findStats(String start, String end, List<String> uris, boolean unique) {
         LocalDateTime startDateTime = LocalDateTime.parse(start, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         LocalDateTime endDateTime = LocalDateTime.parse(end, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-        List<ViewStats> viewStatsList = null;
 
         if (!unique) {
-            viewStatsList = statisticsRepository.findNotUniqueIP(startDateTime, endDateTime, uris);
-        } else if (unique) {
-            viewStatsList = statisticsRepository.findUniqueIp(startDateTime, endDateTime, uris);
+            return statisticsRepository.findNotUniqueIP(startDateTime, endDateTime, uris);
+        } else {
+            return statisticsRepository.findUniqueIp(startDateTime, endDateTime, uris);
         }
-        return viewStatsList;
     }
 }

@@ -20,7 +20,4 @@ public interface EventRepository extends JpaRepository<Event, Long>, QuerydslPre
             "WHERE e IN ?1 AND r.status = 'CONFIRM' " +
             "GROUP BY e.id, r.event.id ")
     List<EventRequestCount> findEventByEventListRequestConfirm(List<Event> eventIdList);
-
-
-    //Event fndOne(BooleanExpression eq);
 }

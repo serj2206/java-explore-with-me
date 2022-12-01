@@ -2,8 +2,6 @@ package ru.practicum.ewmservice.model.location;
 
 import lombok.*;
 
-import javax.persistence.*;
-
 
 @EqualsAndHashCode
 @ToString

@@ -18,5 +18,4 @@ public interface RequestRepository extends JpaRepository<Request, Long>, Queryds
 
     Request findRequestByEventIdAndRequesterId(long eventId, long requesterId);
 
-
 }

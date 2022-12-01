@@ -49,23 +49,4 @@ public class EventShortDto {
         this.confirmedRequests = confirmedRequests;
         this.eventDate = event.getEventDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
     }
-
-    public EventShortDto(Event event, Long confirmedRequests) {
-        this.id = event.getId();
-        this.title = event.getTitle();
-        this.annotation = event.getAnnotation();
-        this.description = event.getDescription();
-        this.category = new CategoryDto(event.getCategory());
-        this.initiator = new UserShortDto(event.getInitiator());
-        this.paid = event.getPaid();
-        this.views = null;
-        this.confirmedRequests = confirmedRequests;
-        this.eventDate = event.getEventDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));;
-    }
-
-
-
-
-
-
 }

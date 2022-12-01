@@ -93,7 +93,6 @@ public class AdminController {
     public void deleteCategory(@Positive @PathVariable Integer catId) {
         log.info("AdminController: DELETE /admin/categories: deleteCategory() catId = {}", catId);
         adminService.deleteCategory(catId);
-        return;
     }
 
 
@@ -120,8 +119,6 @@ public class AdminController {
     public void deleteUser(@Positive @PathVariable Long userId) {
         log.info("AdminController: DELETE /admin/users/{}: deleteUser() userId = {}", userId, userId);
         adminService.deleteUser(userId);
-        return;
-
     }
 
 
@@ -139,7 +136,6 @@ public class AdminController {
     public void deleteCompilation(@Positive @PathVariable Long compId) {
         log.info("AdminController: DELETE /admin/compilations/{}: deleteCompilation() compId = {}", compId, compId);
         adminService.deleteCompilation(compId);
-        return;
     }
 
     //Удалить событие из подборки
@@ -166,7 +162,6 @@ public class AdminController {
         log.info("AdminController: DELETE /admin/compilations/{}/pin: deletePinned() compId = {}",
                 compId, compId);
         adminService.deletePinned(compId);
-        return;
     }
 
     //Закрепить подборку на главной странице
@@ -175,7 +170,6 @@ public class AdminController {
         log.info("AdminController: PATCH /admin/compilations/{}/pin: deletePinned() compId = {}",
                 compId, compId);
         adminService.addPinned(compId);
-        return;
     }
 }
 

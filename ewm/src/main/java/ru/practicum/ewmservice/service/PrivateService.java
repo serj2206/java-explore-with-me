@@ -1,12 +1,10 @@
 package ru.practicum.ewmservice.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.ewmservice.client.PublicClient;
 import ru.practicum.ewmservice.common.FromSizeRequest;
 import ru.practicum.ewmservice.exceptions.ViolationRuleException;
 import ru.practicum.ewmservice.exceptions.ValidationException;
@@ -40,7 +38,6 @@ public class PrivateService {
     private final RequestRepository requestRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
-    private final PublicClient publicClient;
     private final StatsService statsService;
 
 
@@ -49,14 +46,12 @@ public class PrivateService {
     //Получение событий, добавленных текущим пользователем
     @Transactional(readOnly = true)
     public List<EventShortDto> getEvent(long userId, int from, int size) {
-        User user = userRepository.findById(userId)
+       userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException(String.format("Пользователь c id = %d не найден", userId)));
 
         Sort sortById = Sort.by(Sort.Direction.ASC, "id");
         Pageable pageable = FromSizeRequest.of(from, size, sortById);
-        Page<Event> eventPage = eventRepository.findEventByInitiatorId(userId, pageable);
-        List<Event> events = eventPage.toList();
-        return this.toEventShortDtoList(events);
+        return this.toEventShortDtoList(eventRepository.findEventByInitiatorId(userId, pageable).toList());
     }
 
     private List<EventShortDto> toEventShortDtoList(List<Event> events) {
@@ -95,10 +90,10 @@ public class PrivateService {
     @Transactional
     //Изменение события, добавленного текущим пользователем
     public EventFullDto updateEvent(long userId, UpdateEventRequest updateEventRequest) {
-        User user = userRepository.findById(userId)
+        userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException(String.format("Пользователь c id = %d не найден", userId)));
         Event eventDB = eventRepository.findById(updateEventRequest.getEventId())
-                .orElseThrow(() -> new NoSuchElementException(String.format("Событие не найдено")));
+                .orElseThrow(() -> new NoSuchElementException("Событие не найдено"));
 
         Category category = categoryRepository.findById(updateEventRequest.getCategory())
                 .orElseThrow(() -> new NoSuchElementException(String.format("Категория c id = %d не найдена", updateEventRequest.getCategory())));
@@ -134,7 +129,7 @@ public class PrivateService {
     @Transactional(readOnly = true)
     public EventFullDto findEventById(long userId, long eventId) {
 
-        User user = userRepository.findById(userId)
+        userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("Пользователь не найден"));
 
         Event event = eventRepository.findById(eventId)
@@ -156,7 +151,7 @@ public class PrivateService {
     public EventFullDto canceledEventById(long userId, long eventId) {
         //Отменить можно только событие в состоянии ожидания модерации.
 
-        User user = userRepository.findById(userId)
+        userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("Пользователь не найден"));
 
         Event event = eventRepository.findById(eventId)
@@ -183,7 +178,7 @@ public class PrivateService {
     //Получение информации о запросах на участие в событии текущего пользователя
     @Transactional(readOnly = true)
     public List<RequestDto> getParticipationRequest(long userId, long eventId) {
-        User user = userRepository.findById(userId)
+        userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("Пользователь не найден"));
 
         Event event = eventRepository.findById(eventId)
@@ -210,7 +205,7 @@ public class PrivateService {
         Если при подтверждении данной заявки, лимит заявок для события исчерпан,
         то все неподтверждённые заявки необходимо отклонить
         */
-        User user = userRepository.findById(userId)
+        userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("Пользователь не найден"));
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new NoSuchElementException("Событие не найдено"));
@@ -258,10 +253,11 @@ public class PrivateService {
         }
     }
 
+
     //Отклонение чужой заявки на участие в событии текущего пользователя
     @Transactional
     public RequestDto rejectParticipationRequest(long userId, long eventId, long reqId) {
-        User user = userRepository.findById(userId)
+        userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("Пользователь не найден"));
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new NoSuchElementException("Событие не найдено"));
@@ -287,9 +283,7 @@ public class PrivateService {
     public List<ParticipationRequestDto> getMyRequests(long userId) {
         userRepository.findById(userId);
         List<Request> requestList = requestRepository.findByRequesterId(userId);
-        List<ParticipationRequestDto> participationRequestDtoList =
-                requestList.stream().map(RequestMapper::toParticipationRequestDto).collect(Collectors.toList());
-        return participationRequestDtoList;
+        return requestList.stream().map(RequestMapper::toParticipationRequestDto).collect(Collectors.toList());
     }
 
     //Добавление запроса от текущего пользователя на участие в событии
@@ -346,7 +340,7 @@ public class PrivateService {
     //Отмена своего запроса на участие в событии
     public ParticipationRequestDto cancelRequest(long userId, long reqId) {
 
-        User requester = userRepository.findById(userId)
+        userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("Пользователь не найден"));
 
         Request request = requestRepository

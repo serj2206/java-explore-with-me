@@ -16,17 +16,12 @@ public class EventMapper {
         return new EventFullDto(event, views, confirmedRequests);
     }
 
-    public static EventShortDto toEventShortDto(EventRequestCount erc, Integer views) {
-        return new EventShortDto(erc.getEvent(), views, erc.getRequestConfirmCount());
-    }
-
     public static EventShortDto toEventShortDto(Event event, Integer views, Long confirmedRequests) {
         return new EventShortDto(event, views, confirmedRequests);
     }
 
     public static Event toEvent(NewEventDto newEventDto, Category category, LocalDateTime createdOn, User initiator) {
-
-        Event event = Event.builder()
+        return Event.builder()
                 .title(newEventDto.getTitle())
                 .annotation(newEventDto.getAnnotation())
                 .description(newEventDto.getDescription())
@@ -41,64 +36,58 @@ public class EventMapper {
                 .state(State.PENDING)
                 .initiator(initiator)
                 .build();
-        return event;
     }
 
-    public static Event toUpdateEvent(Long eventId, Category category, AdminUpdateEventRequest updateEventRequest, Event eventDB) {
-        Event event = eventDB;
+    public static Event toUpdateEvent(Category category, AdminUpdateEventRequest updateEventRequest, Event eventDB) {
 
         if (updateEventRequest.getTitle() != null) {
-            event.setTitle(updateEventRequest.getTitle());
+            eventDB.setTitle(updateEventRequest.getTitle());
         }
         if (updateEventRequest.getAnnotation() != null) {
-            event.setAnnotation(updateEventRequest.getAnnotation());
+            eventDB.setAnnotation(updateEventRequest.getAnnotation());
         }
         if (updateEventRequest.getDescription() != null) {
-            event.setDescription(updateEventRequest.getDescription());
+            eventDB.setDescription(updateEventRequest.getDescription());
         }
         if (category != null) {
-            event.setCategory(category);
+            eventDB.setCategory(category);
         }
         if (updateEventRequest.getPaid() != null) {
-            event.setPaid(updateEventRequest.getPaid());
+            eventDB.setPaid(updateEventRequest.getPaid());
         }
         if (updateEventRequest.getParticipantLimit() != null) {
-            event.setParticipantLimit(updateEventRequest.getParticipantLimit());
+            eventDB.setParticipantLimit(updateEventRequest.getParticipantLimit());
         }
         if (updateEventRequest.getEventDate() != null) {
-            event.setEventDate(LocalDateTime.parse(updateEventRequest.getEventDate(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+            eventDB.setEventDate(LocalDateTime.parse(updateEventRequest.getEventDate(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
         }
-
-        return event;
+        return eventDB;
     }
 
     public static Event toUpdateEvent(Category category, UpdateEventRequest updateEventRequest, Event eventDB) {
-        Event event = eventDB;
 
         if (updateEventRequest.getTitle() != null) {
-            event.setTitle(updateEventRequest.getTitle());
+            eventDB.setTitle(updateEventRequest.getTitle());
         }
         if (updateEventRequest.getAnnotation() != null) {
-            event.setAnnotation(updateEventRequest.getAnnotation());
+            eventDB.setAnnotation(updateEventRequest.getAnnotation());
         }
         if (updateEventRequest.getDescription() != null) {
-            event.setDescription(updateEventRequest.getDescription());
+            eventDB.setDescription(updateEventRequest.getDescription());
         }
         if (category != null) {
-            event.setCategory(category);
+            eventDB.setCategory(category);
         }
         if (updateEventRequest.getPaid() != null) {
-            event.setPaid(updateEventRequest.getPaid());
+            eventDB.setPaid(updateEventRequest.getPaid());
         }
         if (updateEventRequest.getParticipantLimit() != null) {
-            event.setParticipantLimit(updateEventRequest.getParticipantLimit());
+            eventDB.setParticipantLimit(updateEventRequest.getParticipantLimit());
         }
         if (updateEventRequest.getEventDate() != null) {
-            event.setEventDate(LocalDateTime.parse(updateEventRequest.getEventDate(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+            eventDB.setEventDate(LocalDateTime.parse(updateEventRequest.getEventDate(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
         }
 
-        return event;
+        return eventDB;
     }
-
-
 }

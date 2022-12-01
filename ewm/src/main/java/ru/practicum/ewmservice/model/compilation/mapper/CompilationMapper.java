@@ -14,12 +14,11 @@ import java.util.List;
 public class CompilationMapper {
 
     public static Compilation toCompilation(NewCompilationDto newCompilationDto, List<Event> events) {
-        Compilation compilation = Compilation.builder()
+        return Compilation.builder()
                 .title(newCompilationDto.getTitle())
                 .pinned(newCompilationDto.isPinned())
                 .events(events)
                 .build();
-        return compilation;
     }
 
     public static CompilationDto toCompilationDto(Compilation compilation, List<EventShortDto> eventShortDtoList) {

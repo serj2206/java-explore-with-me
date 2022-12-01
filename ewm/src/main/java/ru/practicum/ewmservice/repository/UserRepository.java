@@ -14,6 +14,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query(value = "SELECT u.* " +
             "FROM users AS u " +
             "WHERE u.id IN ?1 " +
-            "ORDER BY u.id ASC", nativeQuery = true)
+            "ORDER BY u.id ", nativeQuery = true)
     Page<User> findUsersById(List<Long> ids, Pageable pageable);
 }

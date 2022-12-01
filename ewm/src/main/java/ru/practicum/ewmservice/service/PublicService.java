@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewmservice.common.FromSizeRequest;
+import ru.practicum.ewmservice.exceptions.ClassErrorException;
 import ru.practicum.ewmservice.model.category.Category;
 import ru.practicum.ewmservice.model.category.dto.CategoryDto;
 import ru.practicum.ewmservice.model.category.mapper.CategoryMapper;
@@ -30,10 +31,7 @@ import ru.practicum.ewmservice.repository.RequestRepository;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -48,12 +46,10 @@ public class PublicService {
 
     @Transactional
     public EventFullDto findEventById(Long id) {
-        int views = 0; //Получить количество просмотров из сервера статистики
-        Long confirmedRequests = 0L; //Узнать количество оформленны заявок
-        Event event = eventRepository.findById(id).orElseThrow();
-        EventFullDto eventFullDto = EventMapper.toEventFullDto(event, views, confirmedRequests);
-        //Отправить статистику в сервер статистики
-        return eventFullDto;
+        Event event = eventRepository.findById(id).orElseThrow(() -> new NoSuchElementException("Событие не найдено"));
+        Integer views = statsService.getViewsForOneEvent(event, true);
+        Long confirmedRequests = requestRepository.countByEventIdAndStatus(id, RequestStatus.CONFIRMED);
+        return EventMapper.toEventFullDto(event, views, confirmedRequests);
     }
 
     @Transactional
@@ -110,18 +106,24 @@ public class PublicService {
                     .between(start, end));
         }
 
+        if (rangeStart == null && rangeEnd == null) {
+            start = LocalDateTime.now();
+            conditions.add(QEvent.event
+                    .eventDate.after(start));
+        }
+
         BooleanExpression finalCondition = conditions.stream()
                 .reduce(BooleanExpression::and)
-                .get();
+                .orElseThrow(() -> new ClassErrorException("Не корректная работа метода сервиса для не зарегистрированных пользователей"));
 
         Page<Event> eventPage = eventRepository.findAll(finalCondition, pageable);
-
 
         if (sort != null) {
             if (sort.equals("EVENT_DATE")) {
                 List<Event> events = eventPage.stream()
                         .sorted((e1, e2) -> {
                             if (e1.getEventDate().isBefore(e2.getEventDate())) return 1;
+                            if (e1.getEventDate().equals(e2.getEventDate())) return 0;
                             else return -1;
                         })
                         .collect(Collectors.toList());
@@ -130,9 +132,8 @@ public class PublicService {
             if (sort.equals("VIEWS")) {
                 List<EventShortDto> eventShortDtoList = this.toEventShortDtoList(eventPage.toList());
                 return eventShortDtoList.stream()
-                        .sorted((e1, e2) -> (int) (e1.getViews() - e2.getViews()))
+                        .sorted(Comparator.comparingInt(EventShortDto::getViews))
                         .collect(Collectors.toList());
-
             }
         }
         return new ArrayList<>();

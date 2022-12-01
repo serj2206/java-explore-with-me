@@ -3,6 +3,7 @@ package ru.practicum.ewmservice.exceptions;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.ConstraintViolationException;
 
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -37,7 +38,8 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleBadRequestException(final MethodArgumentNotValidException e) {
         log.warn("400 {}", e.getMessage());
-        List<String> errors = e.getAllErrors().stream().map(o -> o.getDefaultMessage()).collect(Collectors.toList());
+        List<String> errors = e.getAllErrors().stream()
+                .map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.toList());
         return new ErrorResponse(
                 errors,
                 e.getMessage(),
@@ -106,9 +108,23 @@ public class ErrorHandler {
         return new ErrorResponse(
                 errors,
                 e.getMessage(),
-                "Неверный формат даты и времени",
+                "Нарушены параметры запроса",
                 HttpStatus.FORBIDDEN.toString(),
                 LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
     }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handleClassErrorException(final ClassErrorException e) {
+        log.warn("500 {}", e.getMessage());
+        List<String> errors = null;
+        return new ErrorResponse(
+                errors,
+                e.getMessage(),
+                "Ошибка, вызванная некорректно работой",
+                HttpStatus.FORBIDDEN.toString(),
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+    }
+
 
 }
