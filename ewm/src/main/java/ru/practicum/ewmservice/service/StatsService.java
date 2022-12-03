@@ -29,6 +29,7 @@ public class StatsService {
         List<ViewStats> viewStatsList = publicClient.findStats(start, end, uris, unique);
 
         if (viewStatsList == null) return null;
+
         Integer views = 0;
         for (ViewStats vs : viewStatsList) {
             views += vs.getHits();

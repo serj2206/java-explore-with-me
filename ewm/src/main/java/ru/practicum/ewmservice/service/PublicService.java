@@ -179,6 +179,7 @@ public class PublicService {
                 eventShortDtoList.add(EventMapper.toEventShortDto(event, null, 0L));
             }
         }
+
         if (eventShortDtoList.size() == 0) return eventShortDtoList;
         List<ViewStats> viewStatsList = statsService.getViewsStatsListByEventShort(eventShortDtoList);
 

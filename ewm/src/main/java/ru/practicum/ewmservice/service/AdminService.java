@@ -159,7 +159,8 @@ public class AdminService {
     //Редактирование событий
     public EventFullDto updateEvent(long eventId, AdminUpdateEventRequest adminUpdateEventRequest) {
 
-        Category category = categoryRepository.findById(adminUpdateEventRequest.getCategory()).orElseThrow();
+        Category category = categoryRepository.findById(adminUpdateEventRequest.getCategory())
+                .orElseThrow(() -> new NoSuchElementException("Категория не найдена"));
         Event eventDb = eventRepository.findById(eventId)
                 .orElseThrow(() -> new NoSuchElementException("Событие не найдено"));
 

@@ -39,8 +39,9 @@ public class PublicClient extends BaseClient {
                 "unique", unique
         );
         ResponseEntity<Object> entity = get("/stats?start={start}&end={end}&uris={uris}&unique={unique}", parameters);
-        List<ViewStats> viewStatsList = (List<ViewStats>) entity.getBody();
-        return viewStatsList;
+
+        return (List<ViewStats>) entity.getBody();
+
     }
 
 }

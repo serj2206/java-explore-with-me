@@ -87,7 +87,6 @@ public class EventMapper {
         if (updateEventRequest.getEventDate() != null) {
             eventDB.setEventDate(LocalDateTime.parse(updateEventRequest.getEventDate(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
         }
-
         return eventDB;
     }
 }

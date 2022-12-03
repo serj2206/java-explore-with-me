@@ -24,7 +24,6 @@ public class StatsController {
     public void addStats(@Validated({Create.class}) @RequestBody EndpointHitDto endpointHitDto) {
         log.info("StatsController POST /hit addStats() endpointHitDto = {} ", endpointHitDto);
         statsService.addStats(endpointHitDto);
-        return;
     }
 
     @GetMapping("/stats")
