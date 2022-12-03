@@ -1,9 +1,11 @@
 package ru.practicum.ewmservice.validation;
 
+import lombok.RequiredArgsConstructor;
 import ru.practicum.ewmservice.exceptions.ValidationException;
 
 import java.time.LocalDateTime;
 
+@RequiredArgsConstructor
 public class Validation {
 
     public static void eventDateValidation(LocalDateTime evenDate) {

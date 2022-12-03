@@ -62,8 +62,8 @@ public class PublicController {
     public List<EventShortDto> searchEvent(@RequestParam(required = false) String text,
                                            @RequestParam(required = false) List<Integer> categories,
                                            @RequestParam(required = false) Boolean paid,
-                                           @RequestParam(required = false) String rangeStart, //Нужна валидация даты
-                                           @RequestParam(required = false) String rangeEnd, //Нужна валидация даты
+                                           @RequestParam(required = false) String rangeStart,
+                                           @RequestParam(required = false) String rangeEnd,
                                            @RequestParam(required = false) boolean onlyAvailable,
                                            @RequestParam(defaultValue = "EVENT_DATE") String sort,
                                            @PositiveOrZero @RequestParam(defaultValue = "0") int from,
