@@ -1,0 +1,34 @@
+package ru.practicum.ewmservice.model.request.dto;
+
+import lombok.*;
+import ru.practicum.ewmservice.model.request.Request;
+import ru.practicum.ewmservice.model.request.RequestStatus;
+
+import java.time.LocalDateTime;
+
+@EqualsAndHashCode
+@ToString
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class RequestDto {
+    private Long id;
+
+    private Long event;
+
+    private Long requester;
+
+    private LocalDateTime created;
+
+    private RequestStatus status;
+
+    public RequestDto(Request request) {
+        this.id = request.getId();
+        this.event = request.getEvent().getId();
+        this.requester = request.getRequester().getId();
+        this.created = request.getCreated();
+        this.status = request.getStatus();
+    }
+}
