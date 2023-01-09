@@ -16,6 +16,5 @@ public class CommentShortDto {
     private EventForCommentDto eventForCommentDto;
     private String createdOn;
     private Boolean commentChanged;
-
 }
 

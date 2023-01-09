@@ -14,7 +14,5 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 public class NewCommentDto {
     @NotBlank(groups = {Create.class})
-    @NotNull(groups = {Create.class})
     private String text;
-
 }

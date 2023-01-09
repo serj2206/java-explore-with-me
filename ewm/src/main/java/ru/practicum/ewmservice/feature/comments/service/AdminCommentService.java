@@ -17,6 +17,7 @@ import ru.practicum.ewmservice.feature.comments.model.dto.CommentFullDto;
 import ru.practicum.ewmservice.feature.comments.model.dto.UpdateCommentDto;
 import ru.practicum.ewmservice.feature.comments.model.mapper.CommentMapper;
 import ru.practicum.ewmservice.feature.comments.repository.CommentRepository;
+import ru.practicum.ewmservice.repository.EventRepository;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -29,6 +30,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AdminCommentService {
     private final CommentRepository commentRepository;
+
+    private final EventRepository eventRepository;
 
 
     //Поиск комментариев
@@ -43,7 +46,6 @@ public class AdminCommentService {
 
         Sort sortById = Sort.by(Sort.Direction.ASC, "id");
         Pageable pageable = FromSizeRequest.of(from, size, sortById);
-
 
         List<BooleanExpression> conditions = new ArrayList<>();
         LocalDateTime start;
@@ -98,6 +100,7 @@ public class AdminCommentService {
                 .collect(Collectors.toList());
     }
 
+    //Поиск комментариев по ID события
     public List<CommentFullDto> findCommentByEvent(Long eventId, Integer from, Integer size) {
 
         Sort sortById = Sort.by(Sort.Direction.ASC, "id");
@@ -112,6 +115,7 @@ public class AdminCommentService {
                 .collect(Collectors.toList()));
     }
 
+    //Запрос комментария по его ID
     public CommentFullDto getCommentById(Long commId) {
         Comment comment = commentRepository
                 .findById(commId)
@@ -119,6 +123,7 @@ public class AdminCommentService {
         return CommentMapper.toCommentFullDto(comment);
     }
 
+    //Редактирование комментария
     public CommentFullDto updateComment(Long commId, UpdateCommentDto updateCommentDto) {
         Comment comment = commentRepository
                 .findById(commId)
@@ -130,10 +135,12 @@ public class AdminCommentService {
         return CommentMapper.toCommentFullDto(commentRepository.save(comment));
     }
 
+    //Удаление комментария
     public void deleteComment(Long commId) {
         commentRepository.deleteById(commId);
     }
 
+    //Запретить комментарий к публикации
     public CommentFullDto blockedComment(Long commId) {
         Comment comment = commentRepository.findById(commId)
                 .orElseThrow(() -> new NoSuchElementException(String.format("Комментарий с id = %d не найден", commId)));
@@ -144,6 +151,7 @@ public class AdminCommentService {
         return CommentMapper.toCommentFullDto(commentRepository.save(comment));
     }
 
+    //Разрешить комментарий к публикации
     public CommentFullDto publishedComment(Long commId) {
         Comment comment = commentRepository.findById(commId)
                 .orElseThrow(() -> new NoSuchElementException(String.format("Комментарий с id = %d не найден", commId)));
@@ -153,5 +161,4 @@ public class AdminCommentService {
         comment.setCommentStatus(CommentStatus.PUBLISHED);
         return CommentMapper.toCommentFullDto(commentRepository.save(comment));
     }
-
 }
