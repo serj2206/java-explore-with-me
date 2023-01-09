@@ -4,7 +4,6 @@ import lombok.*;
 import ru.practicum.ewmservice.common.marker.Create;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 
 
 @ToString
