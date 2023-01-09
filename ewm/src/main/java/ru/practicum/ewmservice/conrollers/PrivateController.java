@@ -34,7 +34,7 @@ public class PrivateController {
     public List<EventShortDto> getEvent(@Positive @PathVariable Long userId,
                                         @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
                                         @Positive @RequestParam(defaultValue = "10") Integer size) {
-        log.info("PrivateController: GET /users/{}/users: getEvent() userId = {}, from = {}, size = {}",
+        log.info("PrivateController: GET /users/{}/events: getEvent() userId = {}, from = {}, size = {}",
                 userId, userId, from, size);
         return privateService.getEvent(userId, from, size);
     }

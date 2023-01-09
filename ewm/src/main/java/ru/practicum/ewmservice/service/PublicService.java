@@ -109,7 +109,7 @@ public class PublicService {
         if (rangeStart == null && rangeEnd == null) {
             start = LocalDateTime.now();
             conditions.add(QEvent.event
-                    .eventDate.after(start));
+                    .eventDate.before(start));
         }
 
         BooleanExpression finalCondition = conditions.stream()

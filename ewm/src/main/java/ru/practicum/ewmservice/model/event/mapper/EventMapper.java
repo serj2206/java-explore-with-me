@@ -89,4 +89,8 @@ public class EventMapper {
         }
         return eventDB;
     }
+
+    public static EventForCommentDto toEventForCommentDto(Event event) {
+        return new EventForCommentDto(event);
+    }
 }
