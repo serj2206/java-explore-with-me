@@ -62,6 +62,4 @@ public class CommentMapper {
         comment.setCommentator(commentator);
         return comment;
     }
-
-
 }
